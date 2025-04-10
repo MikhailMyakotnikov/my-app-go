@@ -1,0 +1,10 @@
+<h1>People</h1>
+<a href="/create">Create New</a>
+<ul>
+    {{range .}}
+    <li>{{.Name}} - {{.Email}} 
+        <a href="/edit?id={{.ID}}">Edit</a> 
+        <a href="/delete?id={{.ID}}">Delete</a>
+    </li>
+    {{end}}
+</ul>

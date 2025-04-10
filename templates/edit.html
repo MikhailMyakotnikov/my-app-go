@@ -1,0 +1,7 @@
+<h1>Edit Person</h1>
+<form method="POST" action="/update">
+    <input type="hidden" name="id" value="{{.ID}}">
+    Name: <input name="name" value="{{.Name}}"><br>
+    Email: <input name="email" value="{{.Email}}"><br>
+    <button type="submit">Update</button>
+</form>
