@@ -1,0 +1,13 @@
+<h1>Create Course</h1>
+<form action="/courses/insert" method="POST">
+    <label>Title:</label><br>
+    <input type="text" name="title" required><br>
+    <label>Teacher:</label><br>
+    <select name="teacher_id">
+        {{range .}}
+        <option value="{{.ID}}">{{.Name}}</option>
+        {{end}}
+    </select><br><br>
+    <input type="submit" value="Create">
+</form>
+<a href="/courses">Back to list</a>

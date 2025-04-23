@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить зачисление</title>
+</head>
+<body>
+    <h1>Добавить зачисление</h1>
+
+    <form method="post" action="/students_courses/insert">
+        <label for="student">Студент:</label>
+        <select name="student_id" id="student">
+            {{ range .Students }}
+            <option value="{{ .ID }}">{{ .Name }}</option>
+            {{ end }}
+        </select>
+        <br><br>
+
+        <label for="course">Курс:</label>
+        <select name="course_id" id="course">
+            {{ range .Courses }}
+            <option value="{{ .ID }}">{{ .Title }}</option>
+            {{ end }}
+        </select>
+        <br><br>
+
+        <input type="submit" value="Зачислить">
+    </form>
+
+    <p><a href="/students_courses">Назад к списку</a></p>
+</body>
+</html>
