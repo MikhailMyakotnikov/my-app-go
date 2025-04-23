@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список студентов</title>
+</head>
+<body>
+    <h1>Студенты</h1>
+
+    {{if .}}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Действия</th>
+            </tr>
+            {{range .}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Name}}</td>
+                <td>
+                    <a href="/students/edit?id={{.ID}}">Редактировать</a> |
+                    <a href="/students/delete?id={{.ID}}" onclick="return confirm('Удалить студента?')">Удалить</a>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>Нет ни одного студента.</p>
+    {{end}}
+
+    <br>
+    <a href="/students/create">Добавить нового студента</a>
+</body>
+</html>

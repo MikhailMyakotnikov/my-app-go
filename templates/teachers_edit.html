@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Teacher</title>
+</head>
+<body>
+    <h1>Edit Teacher</h1>
+    <form action="/teachers/update" method="POST">
+        <input type="hidden" name="id" value="{{.ID}}">
+        <label>Name:</label>
+        <input type="text" name="name" value="{{.Name}}" required>
+        <input type="submit" value="Update">
+    </form>
+    <a href="/teachers">Back to list</a>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список преподавателей</title>
+</head>
+<body>
+    <h1>Преподаватели</h1>
+
+    {{if .}}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Действия</th>
+            </tr>
+            {{range .}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Name}}</td>
+                <td>
+                    <a href="/teachers/edit?id={{.ID}}">Редактировать</a> |
+                    <a href="/teachers/delete?id={{.ID}}" onclick="return confirm('Удалить преподавателя?')">Удалить</a>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>Нет ни одного преподавателя.</p>
+    {{end}}
+
+    <br>
+    <a href="/teachers/create">Добавить преподавателя</a>
+</body>
+</html>

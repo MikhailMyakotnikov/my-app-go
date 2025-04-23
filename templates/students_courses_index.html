@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Записи на курсы</title>
+</head>
+<body>
+    <h1>Записи студентов на курсы</h1>
+
+    {{if .}}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Студент</th>
+                <th>Курс</th>
+                <th>Действия</th>
+            </tr>
+            {{range .}}
+            <tr>
+                <td>{{.StudentName}}</td>
+                <td>{{.CourseTitle}}</td>
+                <td>
+                    <a href="/students_courses/delete?student_id={{.StudentID}}&course_id={{.CourseID}}" onclick="return confirm('Удалить запись?')">Удалить</a>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>Нет ни одной записи.</p>
+    {{end}}
+
+    <br>
+    <a href="/students_courses/create">Добавить запись</a>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить студента</title>
+</head>
+<body>
+    <h1>Новый студент</h1>
+    <form action="/students/insert" method="post">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Сохранить</button>
+    </form>
+    <a href="/students">Назад к списку</a>
+</body>
+</html>

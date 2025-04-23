@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список курсов</title>
+</head>
+<body>
+    <h1>Курсы</h1>
+
+    {{if .}}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Преподаватель</th>
+                <th>Действия</th>
+            </tr>
+            {{range .}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Title}}</td>
+                <td>{{.TeacherName}}</td>
+                <td>
+                    <a href="/courses/edit?id={{.ID}}">Редактировать</a> |
+                    <a href="/courses/delete?id={{.ID}}" onclick="return confirm('Удалить курс?')">Удалить</a>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>Нет ни одного курса.</p>
+    {{end}}
+
+    <br>
+    <a href="/courses/create">Добавить курс</a>
+</body>
+</html>

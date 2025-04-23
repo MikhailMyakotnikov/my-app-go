@@ -5,16 +5,11 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"my-app-go/handlers"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-type Person struct {
-	ID    int
-	Name  string
-	Email string
-}
 
 var db *sql.DB
 var tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -23,83 +18,49 @@ func main() {
 	var err error
 	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Database connection error:", err)
 	}
 	defer db.Close()
 
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/create", createHandler)
-	http.HandleFunc("/insert", insertHandler)
-	http.HandleFunc("/edit", editHandler)
-	http.HandleFunc("/update", updateHandler)
-	http.HandleFunc("/delete", deleteHandler)
+	handlers.Init(db, tpl)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/teachers", http.StatusSeeOther)
+	})
+
+	// teachers
+	http.HandleFunc("/teachers", handlers.ListTeachers)
+	http.HandleFunc("/teachers/create", handlers.CreateTeacher)
+	http.HandleFunc("/teachers/insert", handlers.InsertTeacher)
+	http.HandleFunc("/teachers/edit", handlers.EditTeacher)
+	http.HandleFunc("/teachers/update", handlers.UpdateTeacher)
+	http.HandleFunc("/teachers/delete", handlers.DeleteTeacher)
+
+	// courses
+	http.HandleFunc("/courses", handlers.ListCourses)
+	http.HandleFunc("/courses/create", handlers.CreateCourse)
+	http.HandleFunc("/courses/insert", handlers.InsertCourse)
+	http.HandleFunc("/courses/edit", handlers.EditCourse)
+	http.HandleFunc("/courses/update", handlers.UpdateCourse)
+	http.HandleFunc("/courses/delete", handlers.DeleteCourse)
+
+	// students
+	http.HandleFunc("/students", handlers.ListStudents)
+	http.HandleFunc("/students/create", handlers.CreateStudent)
+	http.HandleFunc("/students/insert", handlers.InsertStudent)
+	http.HandleFunc("/students/edit", handlers.EditStudent)
+	http.HandleFunc("/students/update", handlers.UpdateStudent)
+	http.HandleFunc("/students/delete", handlers.DeleteStudent)
+
+	// students_courses
+	http.HandleFunc("/students_courses", handlers.ListStudentsCourses)
+	http.HandleFunc("/students_courses/create", handlers.CreateStudentCourse)
+	http.HandleFunc("/students_courses/insert", handlers.InsertStudentCourse)
+	http.HandleFunc("/students_courses/delete", handlers.DeleteStudentCourse)
 
 	fmt.Println("Server started at http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT * FROM persons")
+	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+		log.Fatal("Server startup error: ", err)
 	}
-	defer rows.Close()
-
-	var persons []Person
-	for rows.Next() {
-		var p Person
-		rows.Scan(&p.ID, &p.Name, &p.Email)
-		persons = append(persons, p)
-	}
-	tpl.ExecuteTemplate(w, "index.html", persons)
-}
-
-func createHandler(w http.ResponseWriter, r *http.Request) {
-	tpl.ExecuteTemplate(w, "create.html", nil)
-}
-
-func insertHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		name := r.FormValue("name")
-		email := r.FormValue("email")
-		_, err := db.Exec("INSERT INTO persons (name, email) VALUES (?, ?)", name, email)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
-}
-
-func editHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	row := db.QueryRow("SELECT * FROM persons WHERE id = ?", id)
-	var p Person
-	row.Scan(&p.ID, &p.Name, &p.Email)
-	tpl.ExecuteTemplate(w, "edit.html", p)
-}
-
-func updateHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		id := r.FormValue("id")
-		name := r.FormValue("name")
-		email := r.FormValue("email")
-		_, err := db.Exec("UPDATE persons SET name=?, email=? WHERE id=?", name, email, id)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
-}
-
-func deleteHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	_, err := db.Exec("DELETE FROM persons WHERE id = ?", id)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
