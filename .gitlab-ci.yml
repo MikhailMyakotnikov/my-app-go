@@ -1,7 +1,28 @@
 stages:
-  - test
+  - build
+  # - test
+  - deploy
 
-job1:
-  stage: test
+build-job:
+  stage: build
   script:
-    - echo "Pipeline работает!"
+    - go build
+  artifacts:
+    paths:
+      - my-app-go
+
+# test-job:
+#   stage: test
+#   script:
+#     - go test ./... -cover
+#   dependencies:
+#     - build-job
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Деплой приложения..."
+    - chmod +x my-app-go
+    - ./my-app-go
+  dependencies:
+    - build-job

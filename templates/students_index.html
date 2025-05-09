@@ -10,13 +10,11 @@
     {{if .}}
         <table border="1" cellpadding="5">
             <tr>
-                <th>ID</th>
                 <th>Имя</th>
                 <th>Действия</th>
             </tr>
             {{range .}}
             <tr>
-                <td>{{.ID}}</td>
                 <td>{{.Name}}</td>
                 <td>
                     <a href="/students/edit?id={{.ID}}">Редактировать</a> |
