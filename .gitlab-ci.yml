@@ -1,7 +1,27 @@
 stages:
+  - build
   - test
+  - deploy
 
-job1:
+build-job:
+  stage: build
+  script:
+    - go build -o my-app-go
+  artifacts:
+    paths:
+      - my-app-go
+
+test-job:
   stage: test
   script:
-    - echo "Pipeline работает!"
+    - go test -cover ./repositories/
+  dependencies:
+    - build-job
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Артефакт собран, можно деплоить"
+    - zip my-app-go.zip my-app-go
+  dependencies:
+    - build-job
