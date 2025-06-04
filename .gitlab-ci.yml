@@ -21,8 +21,7 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - echo "Деплой приложения..."
-    - chmod +x my-app-go
-    - ./my-app-go
+    - echo "Артефакт собран, можно деплоить"
+    - zip my-app-go.zip my-app-go
   dependencies:
     - build-job
