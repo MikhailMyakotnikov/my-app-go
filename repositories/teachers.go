@@ -58,7 +58,7 @@ func (r *teacherRepo) GetById(id string) (models.Teacher, error) {
 	return t, nil
 }
 
-func (r *teacherRepo) Update(id string, name string) error {
+func (r *teacherRepo) Update(id, name string) error {
 	_, err := r.DB.Exec("UPDATE teachers SET name = ? WHERE id = ?", name, id)
 
 	return err

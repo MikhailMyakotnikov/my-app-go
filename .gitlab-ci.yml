@@ -1,22 +1,22 @@
 stages:
   - build
-  # - test
+  - test
   - deploy
 
 build-job:
   stage: build
   script:
-    - go build
+    - go build -o my-app-go
   artifacts:
     paths:
       - my-app-go
 
-# test-job:
-#   stage: test
-#   script:
-#     - go test ./... -cover
-#   dependencies:
-#     - build-job
+test-job:
+  stage: test
+  script:
+    - go test -cover ./repositories/
+  dependencies:
+    - build-job
 
 deploy-job:
   stage: deploy
