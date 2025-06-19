@@ -23,5 +23,6 @@ deploy-job:
   script:
     - echo "Артефакт собран, можно деплоить"
     - zip my-app-go.zip my-app-go
+    # - flyway -user=$DB_USER -password=$DB_PASS -url=jdbc:mysql://mysql:3306/your_database migrate
   dependencies:
     - build-job
