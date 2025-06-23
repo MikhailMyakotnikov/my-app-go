@@ -18,11 +18,18 @@ test-job:
   dependencies:
     - build-job
 
+check-flyway:
+  image: your-image
+  stage: test
+  script:
+    - which flyway || echo "❌ Flyway не установлен"
+    - flyway -v || echo "❌ Flyway не работает"
+
 deploy-job:
   stage: deploy
   script:
     - echo "Артефакт собран, можно деплоить"
     - zip my-app-go.zip my-app-go
-    # - flyway -user=$DB_USER -password=$DB_PASS -url=jdbc:mysql://mysql:3306/your_database migrate
+    - flyway -user=$DB_USER -password=$DB_PASS -url=jdbc:mysql://mysql:3306/my_app_go?useSSL=true&verifyServerCertificate=true&trustCertificateKeyStoreUrl=file:/etc/mysql/ssl/ca-truststore.jks&trustCertificateKeyStorePassword=123qwe migrate
   dependencies:
     - build-job
