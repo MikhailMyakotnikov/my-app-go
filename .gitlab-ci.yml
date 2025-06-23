@@ -25,6 +25,28 @@ check-flyway:
     - which flyway || echo "❌ Flyway не установлен"
     - flyway -v || echo "❌ Flyway не работает"
 
+check_file:
+  image: your-image
+  stage: test
+  script:
+    - |
+      if [ -f /etc/mysql/ssl/ca-truststore.jks ]; then
+        echo "✅ Файл найден"
+      else
+        echo "❌ Файл не найден"
+      fi
+
+check_mysql:
+  image: mysql:8
+  services:
+    - name: mysql:8
+      alias: mysql
+  variables:
+    MYSQL_ROOT_PASSWORD: root
+  script:
+    - apt-get update && apt-get install -y mysql-client
+    - mysqladmin ping -h mysql -uroot -proot
+
 deploy-job:
   stage: deploy
   script:
