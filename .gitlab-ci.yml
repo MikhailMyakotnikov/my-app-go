@@ -1,3 +1,11 @@
+before_script:
+  - curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.14.0/flyway-commandline-10.14.0-linux-x64.tar.gz | tar xz
+  - export PATH="$PWD/flyway-10.14.0:$PATH"
+
+services:
+  - name: mysql:8
+    alias: mysql
+
 stages:
   - build
   - test
@@ -25,16 +33,16 @@ check-flyway:
     - which flyway || echo "❌ Flyway не установлен"
     - flyway -v || echo "❌ Flyway не работает"
 
-check_file:
-  image: your-image
-  stage: test
-  script:
-    - |
-      if [ -f /etc/mysql/ssl/ca-truststore.jks ]; then
-        echo "✅ Файл найден"
-      else
-        echo "❌ Файл не найден"
-      fi
+# check_file:
+#   image: your-image
+#   stage: test
+#   script:
+#     - |
+#       if [ -f /etc/mysql/ssl/ca-truststore.jks ]; then
+#         echo "✅ Файл найден"
+#       else
+#         echo "❌ Файл не найден"
+#       fi
 
 check_mysql:
   image: mysql:8
