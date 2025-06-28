@@ -1,0 +1,782 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API для управления курсами и студентами",
+        "title": "My CRUD App API",
+        "contact": {},
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/courses": {
+            "get": {
+                "description": "загружает HTML-страницу со списком курсов",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Отображает список курсов",
+                "responses": {
+                    "200": {
+                        "description": "HTML-страница",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/create": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для создания нового курса",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Отображает форму создания курса",
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/delete": {
+            "get": {
+                "description": "Удаляет название курса по ID, переданному через query-параметр",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Удаляет информацию о курсе",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /courses",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/edit": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для редактирования информации о курсе",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Отображает форму редактирования курса",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма редактирования",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/insert": {
+            "post": {
+                "description": "Получает данные из формы и сохраняет новый курс в базу данных",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Создает новый курс",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Название курса",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "teacher_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /courses",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/update": {
+            "post": {
+                "description": "Обновляет название курса по ID, переданному через форму",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Обновляет информацию о курсе",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Новое название курса",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "teacher_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /courses",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students": {
+            "get": {
+                "description": "загружает HTML-страницу со списком студентов",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Отображает список студентов",
+                "responses": {
+                    "200": {
+                        "description": "HTML-страница",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/create": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для создания нового студента",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Отображает форму создания студента",
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/delete": {
+            "get": {
+                "description": "Удаляет имя студента по ID, переданному через query-параметр",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Удаляет информацию о студенте",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /students",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/edit": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для редактирования информации о студенте",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Отображает форму редактирования студента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма редактирования",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/insert": {
+            "post": {
+                "description": "Получает данные из формы и сохраняет нового студента в базу данных",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Создает нового студента",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя студента",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /students",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students/update": {
+            "post": {
+                "description": "Обновляет имя студента по ID, переданному через форму",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Обновляет информацию о студенте",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Новое имя студента",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /students",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students_courses": {
+            "get": {
+                "description": "загружает HTML-страницу со списком студентов и курсов, которые они посещают",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students_courses"
+                ],
+                "summary": "Отображает список студентов и их курсов",
+                "responses": {
+                    "200": {
+                        "description": "HTML-страница",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students_courses/create": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для создания новой записи о студенте и курсе, который он посещает",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students_courses"
+                ],
+                "summary": "Отображает форму создания студентов и их курсов",
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students_courses/delete": {
+            "get": {
+                "description": "Удаляет информацию о студенте и курсе, который он посещает, по ID студента и ID курса, переданным через query-параметры",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students_courses"
+                ],
+                "summary": "Удаляет информацию о студенте и курсе, который он посещает",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "student_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "course_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /students_courses",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/students_courses/insert": {
+            "post": {
+                "description": "Получает данные из формы и сохраняет новую запись о студенте и курсе, который он посещает, в базу данных",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "students_courses"
+                ],
+                "summary": "Создает новую запись о студенте и курсе, который он посещает",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "student_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "course_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /students_courses",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers": {
+            "get": {
+                "description": "загружает HTML-страницу со списком преподавателей",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Отображает список преподавателей",
+                "responses": {
+                    "200": {
+                        "description": "HTML-страница",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/create": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для создания нового преподавателя",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Отображает форму создания преподавателя",
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/delete": {
+            "get": {
+                "description": "Удаляет имя преподавателя по ID, переданному через query-параметр",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Удаляет информацию о преподавателе",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /teachers",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/edit": {
+            "get": {
+                "description": "Загружает HTML-страницу с формой для редактирования информации о преподавателе",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Отображает форму редактирования преподавателя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML-форма редактирования",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/insert": {
+            "post": {
+                "description": "Получает данные из формы и сохраняет нового преподавателя в базу данных",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Создает нового преподавателя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя преподавателя",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /teachers",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/update": {
+            "post": {
+                "description": "Обновляет имя преподавателя по ID, переданному через форму",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "teachers"
+                ],
+                "summary": "Обновляет информацию о преподавателе",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Новое имя преподавателя",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Редирект на /teachers",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

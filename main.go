@@ -8,15 +8,24 @@ import (
 	"my-app-go/handlers"
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "my-app-go/docs"
+
 	_ "github.com/go-sql-driver/mysql"
 )
+
+//		@title			My CRUD App API
+//		@version		1.0
+//		@description	API для управления курсами и студентами
+//	 	@license.name	MIT
 
 var db *sql.DB
 var tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
 	var err error
-	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go")
+	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=custom")
 	if err != nil {
 		log.Fatal("Database connection error:", err)
 	}
@@ -63,4 +72,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Server startup error: ", err)
 	}
+
+	http.Handle("/swagger/", httpSwagger.WrapHandler)
 }

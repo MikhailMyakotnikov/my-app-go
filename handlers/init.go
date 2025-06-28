@@ -15,13 +15,6 @@ var (
 	studentCourseRepository repositories.StudentCourseRepository
 )
 
-// var db *sql.DB
-// var tpl *template.Template
-// var courseRepository repositories.CourseRepository = repositories.NewCourseRepository(db)
-// var teacherRepository repositories.TeacherRepository = repositories.NewTeacherRepository(db)
-// var studentRepository repositories.StudentRepository = repositories.NewStudentRepository(db)
-// var studentCourseRepository repositories.StudentCourseRepository = repositories.NewStudentCourseRepository(db)
-
 func Init(database *sql.DB, templates *template.Template) {
 	db = database
 	tpl = templates
