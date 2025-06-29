@@ -1,18 +1,20 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
 	"my-app-go/handlers"
 	"net/http"
+	"os"
 
+	"github.com/go-sql-driver/mysql"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "my-app-go/docs"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 //		@title			My CRUD App API
@@ -25,6 +27,7 @@ var tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
 	var err error
+	registerTLSConfig()
 	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=custom")
 	if err != nil {
 		log.Fatal("Database connection error:", err)
@@ -67,11 +70,26 @@ func main() {
 	http.HandleFunc("/students_courses/insert", handlers.InsertStudentCourse)
 	http.HandleFunc("/students_courses/delete", handlers.DeleteStudentCourse)
 
+	//Swagger-документация моего API (http://localhost:8080/swagger/index.html)
+	http.Handle("/swagger/", httpSwagger.WrapHandler)
+
 	fmt.Println("Server started at http://localhost:8080")
 	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
 		log.Fatal("Server startup error: ", err)
 	}
+}
 
-	http.Handle("/swagger/", httpSwagger.WrapHandler)
+func registerTLSConfig() {
+	rootCertPool := x509.NewCertPool()
+	pem, err := os.ReadFile("/home/mikhail/mysql-certs/ca.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		log.Fatal("Failed to append PEM.")
+	}
+	mysql.RegisterTLSConfig("custom", &tls.Config{
+		RootCAs: rootCertPool,
+	})
 }

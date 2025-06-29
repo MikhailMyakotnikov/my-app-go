@@ -5,6 +5,7 @@ stages:
   - build
   - test
   - deploy
+  - generate-docs
 
 build-job:
   stage: build
@@ -28,6 +29,15 @@ test-job:
       go test -cover ./repositories/
   dependencies:
     - build-job
+
+check-tools:
+  stage: test
+  script:
+    - echo "Checking go and swag in PATH"
+    - which go || echo "go not found"
+    - go version || echo "go version not available"
+    - which swag || echo "swag not found"
+    - swag version || echo "swag version not available"
 
 check-flyway:
   stage: test
@@ -68,3 +78,19 @@ deploy-job:
       flyway -user=$DB_USER -password=$DB_PASS -url=jdbc:mysql://127.0.0.1:3306/my_app_go?useSSL=true&verifyServerCertificate=true&trustCertificateKeyStoreUrl=file:/etc/mysql/ssl/ca-truststore.jks&trustCertificateKeyStorePassword=123qwe migrate
   dependencies:
     - build-job
+
+generate_docs:
+  stage: generate-docs
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^RELEASE/'
+      when: on_success
+    - when: never
+  before_script:
+    - go install github.com/swaggo/swag/cmd/swag@latest
+    - export PATH=$PATH:$(go env GOPATH)/bin
+  script:
+    - swag init
+    - echo "Документация сгенерирована для тега $CI_COMMIT_TAG"
+  artifacts:
+    paths:
+      - docs/
