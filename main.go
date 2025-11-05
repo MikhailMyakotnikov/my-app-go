@@ -33,8 +33,12 @@ func main() {
 
 	handlers.Init(db, tpl)
 
+	// index
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/teachers", http.StatusSeeOther)
+		err := tpl.ExecuteTemplate(w, "index.html", nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	// teachers
