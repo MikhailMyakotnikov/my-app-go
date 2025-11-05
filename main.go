@@ -12,9 +12,6 @@ import (
 	"os"
 
 	"github.com/go-sql-driver/mysql"
-	httpSwagger "github.com/swaggo/http-swagger"
-
-	_ "my-app-go/docs"
 )
 
 //		@title			My CRUD App API
@@ -69,9 +66,6 @@ func main() {
 	http.HandleFunc("/students_courses/create", handlers.CreateStudentCourse)
 	http.HandleFunc("/students_courses/insert", handlers.InsertStudentCourse)
 	http.HandleFunc("/students_courses/delete", handlers.DeleteStudentCourse)
-
-	//Swagger-документация моего API (http://localhost:8080/swagger/index.html)
-	http.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	fmt.Println("Server started at http://localhost:8080")
 	err = http.ListenAndServe("localhost:8080", nil)
