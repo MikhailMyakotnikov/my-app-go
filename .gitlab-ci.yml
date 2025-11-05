@@ -1,96 +1,23 @@
-before_script:
-  - curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.14.0/flyway-commandline-10.14.0-linux-x64.tar.gz | tar xz
-
 stages:
-  - build
   - test
+  - build
   - deploy
-  - generate-docs
 
-build-job:
+test:
+  stage: test
+  script: go test -cover ./repositories/
+
+build:
   stage: build
-  script:
-    - |
-      export PATH="$PWD/flyway-10.14.0:$PATH"
-      flyway -v
-    
-      go build -o my-app-go
+  script: go build -o my-app-go
+  dependencies:
+    - test
   artifacts:
     paths:
       - my-app-go
 
-test-job:
-  stage: test
-  script:
-    - |
-      export PATH="$PWD/flyway-10.14.0:$PATH"
-      flyway -v
-
-      go test -cover ./repositories/
-  dependencies:
-    - build-job
-
-check-tools:
-  stage: test
-  script:
-    - echo "Checking go and swag in PATH"
-    - which go || echo "go not found"
-    - go version || echo "go version not available"
-    - which swag || echo "swag not found"
-    - swag version || echo "swag version not available"
-
-check-flyway:
-  stage: test
-  script:
-    - |
-      export PATH="$PWD/flyway-10.14.0:$PATH"
-
-      which flyway || echo "❌ Flyway не установлен"
-      flyway -v || echo "❌ Flyway не работает"
-
-check_file:
-  stage: test
-  script:
-    - |
-      export PATH="$PWD/flyway-10.14.0:$PATH"
-      flyway -v
-    
-      if [ -f /etc/mysql/ssl/ca-truststore.jks ]; then
-        echo "✅ Файл найден"
-      else
-        echo "❌ Файл не найден"
-      fi
-
-check_mysql:
-  stage: test
-  script:
-    - mysqladmin ping -h 127.0.0.1 -uroot -proot
-
-deploy-job:
+deploy:
   stage: deploy
-  script:
-    - |
-      export PATH="$PWD/flyway-10.14.0:$PATH"
-      flyway -v
-
-      echo "Артефакт собран, можно деплоить"
-      zip my-app-go.zip my-app-go
-      flyway -user=$DB_USER -password=$DB_PASS -url=jdbc:mysql://127.0.0.1:3306/my_app_go?useSSL=true&verifyServerCertificate=true&trustCertificateKeyStoreUrl=file:/etc/mysql/ssl/ca-truststore.jks&trustCertificateKeyStorePassword=123qwe migrate
+  script: zip my-app-go.zip my-app-go
   dependencies:
     - build-job
-
-generate_docs:
-  stage: generate-docs
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^RELEASE/'
-      when: on_success
-    - when: never
-  before_script:
-    - go install github.com/swaggo/swag/cmd/swag@latest
-    - export PATH=$PATH:$(go env GOPATH)/bin
-  script:
-    - swag init
-    - echo "Документация сгенерирована для тега $CI_COMMIT_TAG"
-  artifacts:
-    paths:
-      - docs/
