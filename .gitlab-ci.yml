@@ -1,8 +1,13 @@
+image: golang:latest
+
 stages:
-  - build
   - test
+  - build
   - deploy
 
+test:
+  stage: test
+  script: go test -cover ./repositories/
 
 build:
   stage: build
@@ -10,12 +15,6 @@ build:
   artifacts:
     paths:
       - my-app-go
-
-test:
-  stage: test
-  script: go test -cover ./repositories/
-  dependencies:
-  - build
 
 deploy:
   stage: deploy
