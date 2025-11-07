@@ -20,4 +20,4 @@ deploy:
   stage: deploy
   script: zip my-app-go.zip my-app-go
   dependencies:
-    - build-job
+    - build
