@@ -5,7 +5,7 @@ stages:
 
 test:
   stage: test
-  before-script:
+  before_script:
     tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
@@ -13,7 +13,7 @@ test:
 
 build:
   stage: build
-  before-script:
+  before_script:
     tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
@@ -24,7 +24,7 @@ build:
 
 deploy:
   stage: deploy
-  before-script:
+  before_script:
     tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
