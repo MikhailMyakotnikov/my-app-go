@@ -1,0 +1,23 @@
+image: golang:1.24
+
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script: go test -cover ./repositories/
+
+build:
+  stage: build
+  script: go build -o my-app-go
+  artifacts:
+    paths:
+      - my-app-go
+
+deploy:
+  stage: deploy
+  script: zip my-app-go.zip my-app-go
+  dependencies:
+    - build
