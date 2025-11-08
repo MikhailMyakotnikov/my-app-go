@@ -6,7 +6,7 @@ stages:
 test:
   stage: test
   before_script:
-    tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
+    sudo apt install golang-go &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
   script: go test -cover ./repositories/
@@ -14,7 +14,7 @@ test:
 build:
   stage: build
   before_script:
-    tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
+    sudo apt install golang-go &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
   script: go build -o my-app-go
@@ -25,7 +25,7 @@ build:
 deploy:
   stage: deploy
   before_script:
-    tar -C /usr/local -xzf go1.25.4.linux-amd64.tar.gz &&
+    sudo apt install golang-go &&
     export PATH=$PATH:/usr/local/go/bin &&
     go version
   script: zip my-app-go.zip my-app-go
