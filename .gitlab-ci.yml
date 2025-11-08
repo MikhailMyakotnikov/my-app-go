@@ -6,16 +6,14 @@ stages:
 test:
   stage: test
   before_script:
-    sudo apt install golang-go &&
-    export PATH=$PATH:/usr/local/go/bin &&
+    apt install golang-go &&
     go version
   script: go test -cover ./repositories/
 
 build:
   stage: build
   before_script:
-    sudo apt install golang-go &&
-    export PATH=$PATH:/usr/local/go/bin &&
+    apt install golang-go &&
     go version
   script: go build -o my-app-go
   artifacts:
@@ -25,8 +23,7 @@ build:
 deploy:
   stage: deploy
   before_script:
-    sudo apt install golang-go &&
-    export PATH=$PATH:/usr/local/go/bin &&
+    apt install golang-go &&
     go version
   script: zip my-app-go.zip my-app-go
   dependencies:
