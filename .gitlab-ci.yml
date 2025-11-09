@@ -18,6 +18,9 @@ build:
 
 deploy:
   stage: deploy
+  before_script: 
+    - apt install -y zip
+    - zip -v
   script: zip my-app-go.zip my-app-go
   dependencies:
     - build
