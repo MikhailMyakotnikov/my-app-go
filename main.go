@@ -24,6 +24,7 @@ var tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
 	var err error
+
 	registerTLSConfig()
 	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=custom")
 	if err != nil {
