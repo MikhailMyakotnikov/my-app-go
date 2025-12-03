@@ -31,6 +31,12 @@ release:
   image: registry.gitlab.com/gitlab-org/cli:latest
   rules:
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
+  before_script:
+    - echo "Installing Go 1.24..."
+    - wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz -O /tmp/go.tar.gz
+    - tar -C /usr/local -xzf /tmp/go.tar.gz
+    - export PATH="/usr/local/go/bin:$PATH"
+    - go version
   script: 
       - . generate_go_documentation.sh
       - generate_go_documentation
