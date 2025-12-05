@@ -42,7 +42,8 @@ release:
     - export PATH="$PATH:/root/go/bin"
     - godoc --help
   script: 
-      - . generate_go_documentation.sh
+      - set -x
+      - ./generate_go_documentation.sh
       - generate_go_documentation
   release:
     tag_name: $CI_COMMIT_TAG
