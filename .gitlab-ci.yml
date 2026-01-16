@@ -41,10 +41,9 @@ release:
     - go install golang.org/x/tools/cmd/godoc@v0.1.0
     - export PATH="$PATH:/root/go/bin"
     - godoc --help
-  script: 
-      - set -x
-      - ./generate_go_documentation.sh
-      - generate_go_documentation
+  script:
+    - ./generate_go_documentation.sh
+    - generate_go_documentation
   release:
     tag_name: $CI_COMMIT_TAG
-    description: 'Release created using the CLI.'
+    description: 'Release $CI_COMMIT_TAG'
