@@ -41,6 +41,7 @@ release:
     - go install golang.org/x/tools/cmd/godoc@v0.1.0
     - export PATH="$PATH:/root/go/bin"
     - godoc --help
+    - apk add bash
   script:
     - echo "running release_job..."
     - ./generate_go_documentation.sh
