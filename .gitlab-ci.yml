@@ -52,7 +52,7 @@ release:
     tag_name: '$CI_COMMIT_TAG'
     description: '$CI_COMMIT_TAG'
 
-pages:
+create-pages:
   stage: release
   needs:
     - job: generate_docs
