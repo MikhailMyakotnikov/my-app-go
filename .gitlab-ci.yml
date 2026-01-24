@@ -8,11 +8,11 @@ stages:
 
 test:
   stage: test
-  script: go test -cover ./repositories/
+  script: go test -mod=vendor -cover ./repositories/
 
 build:
   stage: build
-  script: go build -o my-app-go
+  script: go build -mod=vendor -o my-app-go
   artifacts:
     paths:
       - my-app-go
