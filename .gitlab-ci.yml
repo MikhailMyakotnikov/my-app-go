@@ -56,7 +56,6 @@ pages:
   stage: release
   needs:
     - job: generate_docs
-    - job: release
   script:
     - mv godoc public
   artifacts:
