@@ -5,18 +5,30 @@ import (
 	"my-app-go/models"
 )
 
+// TeacherRepository defines database operations for working with
+// a table of teachers.
 type TeacherRepository interface {
 	GetAll() ([]models.Teacher, error)
+
+	// Insert creates a new teacher with the given name.
 	Insert(name string) error
+
+	// GetById gets information about a teacher by ID.
 	GetById(id string) (models.Teacher, error)
-	Update(id string, name string) error
+
+	// Update updates an existing teacher by ID.
+	Update(id, name string) error
+
+	// Delete removes a teacher by ID.
 	Delete(id string) error
 }
 
+// teacherRepo is a SQL-based implementation of TeacherRepository.
 type teacherRepo struct {
 	DB *sql.DB
 }
 
+// NewTeacherRepository creates a new TeacherRepository backed by an SQL database.
 func NewTeacherRepository(db *sql.DB) TeacherRepository {
 	return &teacherRepo{DB: db}
 }
@@ -35,6 +47,10 @@ func (r *teacherRepo) GetAll() ([]models.Teacher, error) {
 			return nil, err
 		}
 		teachers = append(teachers, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return teachers, nil

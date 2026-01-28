@@ -1,23 +1,13 @@
 package main
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
 	"my-app-go/handlers"
 	"net/http"
-	"os"
-
-	"github.com/go-sql-driver/mysql"
 )
-
-//		@title			My CRUD App API
-//		@version		1.0
-//		@description	API для управления курсами и студентами
-//	 	@license.name	MIT
 
 var db *sql.DB
 var tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -25,8 +15,7 @@ var tpl = template.Must(template.ParseGlob("templates/*.html"))
 func main() {
 	var err error
 
-	registerTLSConfig()
-	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=custom")
+	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=skip-verify")
 	if err != nil {
 		log.Fatal("Database connection error:", err)
 	}
@@ -77,18 +66,4 @@ func main() {
 	if err != nil {
 		log.Fatal("Server startup error: ", err)
 	}
-}
-
-func registerTLSConfig() {
-	rootCertPool := x509.NewCertPool()
-	pem, err := os.ReadFile("/home/mikhail/mysql-certs/ca.pem")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-		log.Fatal("Failed to append PEM.")
-	}
-	mysql.RegisterTLSConfig("custom", &tls.Config{
-		RootCAs: rootCertPool,
-	})
 }

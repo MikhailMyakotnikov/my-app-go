@@ -15,6 +15,8 @@ var (
 	studentCourseRepository repositories.StudentCourseRepository
 )
 
+// Init initializes the dependencies of the handlers package:
+// database, templates, and repositories
 func Init(database *sql.DB, templates *template.Template) {
 	db = database
 	tpl = templates

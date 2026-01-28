@@ -1,11 +1,11 @@
-# Скомпилированный бинарник
+# Compiled binary file
 /my-app-go
 
-# Каталоги IDE
+# IDE сatalogs
 .vscode/
 
-# Архивы сборки
+# Build Archives
 *.zip
 
-# статическая документация
+# Static documentation
 godoc/
