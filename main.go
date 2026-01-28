@@ -7,6 +7,8 @@ import (
 	"log"
 	"my-app-go/handlers"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var db *sql.DB
