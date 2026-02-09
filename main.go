@@ -7,8 +7,10 @@ import (
 	"log"
 	"my-app-go/handlers"
 	"net/http"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var db *sql.DB
@@ -17,7 +19,24 @@ var tpl = template.Must(template.ParseGlob("templates/*.html"))
 func main() {
 	var err error
 
-	db, err = sql.Open("mysql", "mikhail:123qwe@tcp(127.0.0.1:3306)/my_app_go?tls=skip-verify")
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf(
+		// user:123@tcp(127.0.0.1:1234)/my_app_go
+		"%s:%s@tcp(%s:%s)/%s?tls=skip-verify",
+		dbUser, dbPass, dbHost, dbPort, dbName,
+	)
+
+	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("Database connection error:", err)
 	}
