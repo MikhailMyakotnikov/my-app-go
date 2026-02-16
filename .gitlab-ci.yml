@@ -51,7 +51,7 @@ publish_docs:
     - chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
   script:
-    - ssh -i ~/.ssh/ci_key mikhail@10.59.127.20s6 # health check
+    - ssh -i ~/.ssh/id_ed25519 mikhail@10.59.127.20s6 # health check
     - scp -i ~/.ssh/id_ed25519 -r godoc/* $SSH_USER@$SSH_HOST:/opt/my-app-go/docs/
 
 release:
