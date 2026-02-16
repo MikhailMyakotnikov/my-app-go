@@ -1,0 +1,8 @@
+services:
+  apache:
+    image: httpd:2.4
+    container_name: my-app-go-publish-docs
+    ports:
+      - "8082:80"
+    volumes:
+      - /opt/my-app-go/docs:/usr/local/apache2/htdocs/
