@@ -5,4 +5,4 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - /opt/my-app-go/docs:/usr/local/apache2/htdocs/
+      - $DOCS_PATH:/usr/local/apache2/htdocs/

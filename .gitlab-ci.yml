@@ -45,6 +45,11 @@ publish_docs:
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
   needs:
     - job: generate_docs
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
   script:
     - scp -r godoc/* $SSH_USER@$SSH_HOST:/opt/my-app-go/docs/
 
