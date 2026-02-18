@@ -9,3 +9,6 @@
 
 # Static documentation
 godoc/
+
+# Application configuration
+.env
