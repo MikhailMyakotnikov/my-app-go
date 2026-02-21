@@ -82,8 +82,8 @@ func main() {
 	http.HandleFunc("/students_courses/insert", handlers.InsertStudentCourse)
 	http.HandleFunc("/students_courses/delete", handlers.DeleteStudentCourse)
 
-	fmt.Println("Server started at http://localhost:8081")
-	err = http.ListenAndServe("localhost:8081", nil)
+	fmt.Println("Server started at http://0.0.0.0:8081")
+	err = http.ListenAndServe("0.0.0.0:8081", nil)
 	if err != nil {
 		log.Fatal("Server startup error: ", err)
 	}
