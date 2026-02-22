@@ -10,8 +10,14 @@ public class TeacherTests
     [Test]
     public void CreateTeacher()
     {
-        IWebDriver driver = new ChromeDriver();
-        driver.Navigate().GoToUrl("http://host.docker.internal:8081");
+        ChromeOptions options = new ChromeOptions();
+
+        IWebDriver driver = new RemoteWebDriver(
+            new Uri("http://localhost:4444"), 
+            options
+        );
+
+        driver.Navigate().GoToUrl("http://localhost:8081");
 
         driver.Quit();
     }

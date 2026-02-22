@@ -6,3 +6,8 @@ services:
       - "8082:80"
     volumes:
       - $DOCS_PATH:/usr/local/apache2/htdocs/
+
+  selenium-chrome:
+      image: selenium/standalone-chrome:latest
+      container_name: selenium-chrome
+      network_mode: host
