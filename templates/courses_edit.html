@@ -1,14 +1,14 @@
 <h1>Edit Course</h1>
 <form action="/courses/update" method="POST">
     <input type="hidden" name="id" value="{{.Course.ID}}">
-    <label>Title:</label><br>
+    <label>Название:</label><br>
     <input type="text" name="title" value="{{.Course.Title}}" required><br>
-    <label>Teacher:</label><br>
+    <label>Преподаватель:</label><br>
     <select name="teacher_id">
         {{range .Teachers}}
         <option value="{{.ID}}" {{if eq .ID $.Course.TeacherID}}selected{{end}}>{{.Name}}</option>
         {{end}}
     </select><br><br>
-    <input type="submit" value="Update">
+    <button type="submit">Сохранить</button>
 </form>
-<a href="/courses">Back to list</a>
+<a href="/courses">Назад к списку</a>

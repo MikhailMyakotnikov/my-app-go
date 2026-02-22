@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Teacher</title>
+    <title>Редактировать запись о преподавателе</title>
 </head>
 <body>
-    <h1>Edit Teacher</h1>
+    <h1>Редактировать запись о преподавателе</h1>
     <form action="/teachers/update" method="POST">
         <input type="hidden" name="id" value="{{.ID}}">
-        <label>Name:</label>
+        <label>Имя:</label>
         <input type="text" name="name" value="{{.Name}}" required>
-        <input type="submit" value="Update">
+        <button type="submit">Сохранить</button>
     </form>
-    <a href="/teachers">Back to list</a>
+    <a href="/teachers">назад к списку</a>
 </body>
 </html>

@@ -1,32 +1,25 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Добавить зачисление</title>
+    <title>Добавить запись о студенте и его курсе</title>
 </head>
 <body>
-    <h1>Добавить зачисление</h1>
-
-    <form method="post" action="/students_courses/insert">
-        <label for="student">Студент:</label>
+    <h1>Новая запись о студенте и его курсе</h1>
+    <form action="/students_courses/insert" method="post">
+        <label for="student_id">Студент:</label>
         <select name="student_id" id="student">
             {{ range .Students }}
             <option value="{{ .ID }}">{{ .Name }}</option>
             {{ end }}
         </select>
-        <br><br>
-
-        <label for="course">Курс:</label>
+        <label for="course_id">Курс:</label>
         <select name="course_id" id="course">
             {{ range .Courses }}
             <option value="{{ .ID }}">{{ .Title }}</option>
             {{ end }}
         </select>
-        <br><br>
-
-        <input type="submit" value="Зачислить">
+        <input type="submit" value="Сохранить">
     </form>
-
-    <p><a href="/students_courses">Назад к списку</a></p>
+    <a href="/students_courses">Назад к списку</a>
 </body>
 </html>

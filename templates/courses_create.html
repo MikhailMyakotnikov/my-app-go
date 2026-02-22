@@ -1,13 +1,21 @@
-<h1>Create Course</h1>
-<form action="/courses/insert" method="POST">
-    <label>Title:</label><br>
-    <input type="text" name="title" required><br>
-    <label>Teacher:</label><br>
-    <select name="teacher_id">
-        {{range .}}
-        <option value="{{.ID}}">{{.Name}}</option>
-        {{end}}
-    </select><br><br>
-    <input type="submit" value="Create">
-</form>
-<a href="/courses">Back to list</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить курс</title>
+</head>
+<body>
+    <h1>Новый курс</h1>
+    <form action="/courses/insert" method="POST">
+        <label for="title">Название:</label><br>
+        <input type="text" name="title" required><br>
+        <label for="teacher_id">Преподаватель:</label><br>
+        <select name="teacher_id">
+            {{range .}}
+            <option value="{{.ID}}">{{.Name}}</option>
+            {{end}}
+        </select><br><br>
+        <button type="submit">Сохранить</button>
+    </form>
+    <a href="/courses">Назад к списку</a>
+</body>
+</html>

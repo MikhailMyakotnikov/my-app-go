@@ -25,6 +25,12 @@ public class TeacherTests
         string name = "Преподаватель";
         nameInput.SendKeys(name);
 
+        IWebElement submitButton = driver.FindElement(By.CssSelector(
+            "[data-testid='create-teacher-btn']"));
+        submitButton.Click();
+
+        
+
         driver.Quit();
     }
 }
