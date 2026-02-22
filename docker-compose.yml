@@ -10,4 +10,7 @@ services:
   selenium-chrome:
       image: selenium/standalone-chrome:latest
       container_name: selenium-chrome
-      network_mode: host
+      ports:
+        - "4444:4444"
+      extra_hosts:
+        - "host.docker.internal:host-gateway"

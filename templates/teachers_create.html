@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Teacher</title>
+    <title>Добавить преподавателя</title>
 </head>
 <body>
-    <h1>Create Teacher</h1>
+    <h1>Новый преподаватель</h1>
     <form action="/teachers/insert" method="POST">
-        <label>Name:</label>
+        <label for="name">Имя:</label>
         <input type="text" name="name" required>
-        <input type="submit" value="Create">
+        <button type="submit" data-testid="create-teacher-btn">Сохранить</button>
     </form>
-    <a href="/teachers">Back to list</a>
+    <a href="/teachers">назад к списку</a>
 </body>
 </html>

@@ -12,12 +12,18 @@ public class TeacherTests
     {
         ChromeOptions options = new ChromeOptions();
 
+        string seleniumServerUri = "http://localhost:4444";
         IWebDriver driver = new RemoteWebDriver(
-            new Uri("http://localhost:4444"), 
+            new Uri(seleniumServerUri), 
             options
         );
 
-        driver.Navigate().GoToUrl("http://localhost:8081");
+        string appUrl = "http://host.docker.internal:8081/teachers/create";
+        driver.Navigate().GoToUrl(appUrl);
+
+        IWebElement nameInput = driver.FindElement(By.Name("name"));
+        string name = "Преподаватель";
+        nameInput.SendKeys(name);
 
         driver.Quit();
     }
