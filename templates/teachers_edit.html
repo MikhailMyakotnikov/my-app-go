@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <title>Редактировать запись о преподавателе</title>
 </head>
 <body>
@@ -9,7 +10,7 @@
         <input type="hidden" name="id" value="{{.ID}}">
         <label>Имя:</label>
         <input type="text" name="name" value="{{.Name}}" required>
-        <button type="submit">Сохранить</button>
+        <button type="submit" data-testid="confirm-edit-teacher-btn">Сохранить</button>
     </form>
     <a href="/teachers">назад к списку</a>
 </body>
