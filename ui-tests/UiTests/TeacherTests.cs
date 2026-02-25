@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -8,33 +7,157 @@ namespace UiTests;
 
 public class TeacherTests
 {
-    [Test]
-    public void CreateTeacher()
+    private IWebDriver driver;
+    private WebDriverWait wait;
+    private const string SeleniumServerUri = "http://localhost:4444";
+    private const string BaseAppUrl = "http://localhost:8081";
+    private readonly List<string> createdTeachers = new();
+    private const string CreateTeacherButtonTestId = "create-teacher-btn";
+    private const string EditTeacherButtonTestId = "edit-teacher-action-btn";
+    private const string ConfirmEditTeacherButtonTestId = "confirm-edit-teacher-btn";
+    private const string DeleteTeacherButtonTestId = "delete-teacher-action-btn";
+    [SetUp]
+    public void SetUp()
     {
+        Uri uri = new Uri(SeleniumServerUri);
+
         ChromeOptions options = new ChromeOptions();
 
-        string seleniumServerUri = "http://localhost:4444";
-        IWebDriver driver = new RemoteWebDriver(
-            new Uri(seleniumServerUri), 
-            options
-        );
+        driver = new RemoteWebDriver(uri, options);
 
-        string appUrl = "http://localhost:8081/teachers/create";
-        driver.Navigate().GoToUrl(appUrl);
-
-        // IWebElement nameInput = driver.FindElement(By.Name("name"));
-        // string name = "Преподаватель";
-        // nameInput.SendKeys(name);
-
-        // IWebElement submitButton = driver.FindElement(By.CssSelector(
-        //     "[data-testid='create-teacher-btn']"));
-        // submitButton.Click();
-
-        // WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
-        // wait.Until(driver => driver.Url.Contains("/teachers"));
-
-        
-
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+    }
+    [TearDown]
+    public void TearDown()
+    {
+        foreach (var name in createdTeachers)
+        {
+            DeleteTeacherByName(name);
+        }
         driver.Quit();
+    }
+    private IWebElement FindTeacherData(string name)
+    {
+        return wait.Until(driver => driver.FindElement(By.XPath(
+            $"//td[text()='{name}']")));
+    }
+    private IWebElement FindTeacherRow(string name)
+    {
+        return wait.Until(driver => driver.FindElement(
+            By.XPath($"//tr[td[text()='{name}']]")));
+    }
+    private void FindAndClickButton(string htmlTagAttribute)
+    {
+        IWebElement button = wait.Until(driver => driver.FindElement(By.CssSelector(
+            $"[data-testid='{htmlTagAttribute}']")));
+
+        button.Click();
+    }
+    private void FindAndClickButton(string htmlTagAttribute, IWebElement tableRow)
+    {
+        IWebElement button = wait.Until(_ => tableRow.FindElement
+            (By.CssSelector($"[data-testid='{htmlTagAttribute}']")));
+
+        button.Click();
+    }
+    private string CreateTeacher()
+    {
+        string appUrl = $"{BaseAppUrl}/teachers/create";
+        driver.Navigate().GoToUrl(appUrl);
+        wait.Until(driver => driver.Url.Contains("/teachers/create"));
+
+        IWebElement nameInput = wait.Until(driver => driver.FindElement(
+            By.Name("name")));
+
+        string name = $"Teacher_{Guid.NewGuid().ToString().Substring(0, 8)}";
+        //Example: Teacher_f3a1c5a4
+        nameInput.SendKeys(name);
+
+        FindAndClickButton(CreateTeacherButtonTestId);
+
+        createdTeachers.Add(name);
+
+        return name;
+    }
+    private void DeleteTeacherByName(string name)
+    {
+        driver.Navigate().GoToUrl($"{BaseAppUrl}/teachers");
+
+        var rows = driver.FindElements(By.XPath($"//tr[td[text()='{name}']]"));
+
+        if (rows.Count == 0) return;
+
+        IWebElement row = rows[0];
+
+        IWebElement button = row.FindElement
+            (By.CssSelector($"[data-testid='{DeleteTeacherButtonTestId}']"));
+
+        button.Click();
+
+        IAlert alert = wait.Until(driver => driver.SwitchTo().Alert());
+        alert.Accept();
+
+        wait.Until(driver => driver.FindElements(By.XPath($"//td[text()='{name}']"))
+            .Count == 0);
+    }
+    [Test]
+    public void CreateTeacher_ShouldDisplayTeacherInTable()
+    {
+        string name = CreateTeacher();
+
+        IWebElement createdTeacher = FindTeacherData(name);
+
+        Assert.That(createdTeacher.Displayed, Is.True);
+    }
+    [Test]
+    public void EditTeacher_ShouldUpdateTeacherName()
+    {
+        string name = CreateTeacher();
+
+        IWebElement createdTeacher = FindTeacherData(name);
+
+        Assert.That(createdTeacher.Displayed, Is.True);
+
+        IWebElement row = FindTeacherRow(name);
+
+        FindAndClickButton(EditTeacherButtonTestId, row);
+
+        IWebElement nameInput = wait.Until(driver => driver.FindElement(
+            By.Name("name")));
+
+        string editedName = $"Edited_Teacher_{Guid.NewGuid().ToString().
+            Substring(0, 8)}";//Example: Edited_Teacher_f3a1c5a4
+        nameInput.Clear();
+        nameInput.SendKeys(editedName);
+
+        createdTeachers.Remove(name);
+        createdTeachers.Add(editedName);
+
+        FindAndClickButton(ConfirmEditTeacherButtonTestId);
+
+        IWebElement editedTeacher = FindTeacherData(editedName);
+
+        Assert.That(editedTeacher.Displayed, Is.True);
+    }
+    [Test]
+    public void DeleteTeacher_ShouldRemoveTeacherFromTable()
+    {
+        string name = CreateTeacher();
+
+        IWebElement createdTeacher = FindTeacherData(name);
+
+        Assert.That(createdTeacher.Displayed, Is.True);
+
+        IWebElement row = FindTeacherRow(name);
+
+        FindAndClickButton(DeleteTeacherButtonTestId, row);
+
+        IAlert alert = wait.Until(driver => driver.SwitchTo().Alert());
+        alert.Accept();
+
+        bool isNameDeleted = wait.Until(driver => driver.FindElements(
+            By.XPath($"//td[text()='{name}']")).Count == 0);
+
+        Assert.That(isNameDeleted, Is.True);
     }
 }
