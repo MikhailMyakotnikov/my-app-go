@@ -15,3 +15,10 @@ godoc/
 
 # database dump
 full_dump.sql
+
+# .NET UI tests build artifacts
+ui-tests/**/bin/
+ui-tests/**/obj/
+ui-tests/**/TestResults/
+*.user
+*.suo
