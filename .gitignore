@@ -12,3 +12,6 @@ godoc/
 
 # Application configuration
 .env
+
+# database dump
+full_dump.sql

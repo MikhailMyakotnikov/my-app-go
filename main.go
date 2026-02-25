@@ -31,7 +31,7 @@ func main() {
 	dbName := os.Getenv("DB_NAME")
 
 	dsn := fmt.Sprintf(
-		// user:123@tcp(127.0.0.1:1234)/my_app_go
+		// Example: user:123@tcp(127.0.0.1:1234)/my_app_go
 		"%s:%s@tcp(%s:%s)/%s?tls=skip-verify",
 		dbUser, dbPass, dbHost, dbPort, dbName,
 	)
