@@ -17,6 +17,11 @@ build:
     paths:
       - my-app-go
 
+selenium:
+  stage: build
+  script: 
+    - cd UiTests
+
 deploy:
   stage: deploy
   before_script: 
