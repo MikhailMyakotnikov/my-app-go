@@ -8,6 +8,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - $PROJECT_PATH/full_dump.sql:/docker-entrypoint-initdb.d/full_dump.sql
+    ports:
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 15s
@@ -35,14 +37,27 @@ services:
     volumes:
       - ./.env:/app/.env:ro
 
+  apache:
+    image: httpd:2.4
+    container_name: my-app-go-publish-docs
+    ports:
+      - "8082:80"
+    volumes:
+      - $DOCS_PATH:/usr/local/apache2/htdocs/
+    profiles: ["docs"]
+
   selenium-chrome:
     image: selenium/standalone-chrome:4.18.1
-    environment:
-      SELENIUM_SERVER_URI: "http://localhost:4444"
-      APP_BASE_URL: "http://app:8081"
     container_name: selenium-chrome
+    depends_on:
+      - app
     ports:
       - "4444:4444"
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    profiles: ["ui-tests"]
 
 volumes:
   mysql_data:
+
+
