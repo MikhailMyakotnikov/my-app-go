@@ -1,3 +1,8 @@
+# Build artefacts
+bin/
+obj/
+node_modules/
+
 # Compiled binary file
 /my-app-go
 
@@ -17,5 +22,36 @@ godoc/
 full_dump.sql
 
 # .NET UI tests build artifacts
-UiTests/bin/
-UiTests/obj/
+ui-tests/UiTests/bin/
+ui-tests/UiTests/obj/
+ui-tests/UiTests/TestResults/
+ui-tests/UiTests/*.trx
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go build cache
+/bin/
+/build/
+*.test
+coverage.out
+
+# Secrets
+secrets.json
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+
+# Cloud credentials
+.aws/
+.azure/
