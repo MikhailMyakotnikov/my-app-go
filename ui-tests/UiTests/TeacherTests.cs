@@ -13,8 +13,6 @@ public class TeacherTests
         .GetEnvironmentVariable("SELENIUM_SERVER_URI");
     private static readonly string? BaseAppUrl = Environment
         .GetEnvironmentVariable("APP_BASE_URL");
-    // private static readonly string? SeleniumServerUri = "http://localhost:4444";
-    // private static readonly string? BaseAppUrl = "http://localhost:8081";
     private readonly List<string> createdTeachers = new();
     private const string CreateTeacherButtonTestId = "create-teacher-btn";
     private const string EditTeacherButtonTestId = "edit-teacher-action-btn";

@@ -22,7 +22,7 @@ services:
     container_name: my-app-go
     restart: unless-stopped
     environment:
-      DB_HOST: $DB_HOST
+      DB_HOST: mysql
       DB_PORT: $DB_PORT
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASS
@@ -37,12 +37,21 @@ services:
 
   selenium-chrome:
     image: selenium/standalone-chrome:4.18.1
-    environment:
-      SELENIUM_SERVER_URI: "http://localhost:4444"
-      APP_BASE_URL: "http://app:8081"
     container_name: selenium-chrome
     ports:
       - "4444:4444"
+    profiles: ["ui-tests"]
+
+  ui-tests:
+    build:
+      context: ./ui-tests/UiTests
+    depends_on:
+      - app
+      - selenium-chrome
+    environment:
+      SELENIUM_SERVER_URI: http://selenium:4444
+      APP_BASE_URL: http://app:8081
+    profiles: ["ui-tests"]
 
 volumes:
   mysql_data:
