@@ -8,6 +8,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - $PROJECT_PATH/full_dump.sql:/docker-entrypoint-initdb.d/full_dump.sql
+    ports:
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 15s
@@ -15,43 +17,13 @@ services:
       retries: 5
       start_period: 60s
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: my-app-go
-    restart: unless-stopped
-    environment:
-      DB_HOST: mysql
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASS
-      DB_NAME: $DB_NAME
-    depends_on:
-      mysql:
-        condition: service_healthy
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./.env:/app/.env:ro
-
   selenium-chrome:
     image: selenium/standalone-chrome:4.18.1
     container_name: selenium-chrome
     ports:
       - "4444:4444"
-    profiles: ["ui-tests"]
-
-  ui-tests:
-    build:
-      context: ./ui-tests/UiTests
-    depends_on:
-      - app
-      - selenium-chrome
-    environment:
-      SELENIUM_SERVER_URI: http://selenium:4444
-      APP_BASE_URL: http://app:8081
-    profiles: ["ui-tests"]
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
 
 volumes:
   mysql_data:
