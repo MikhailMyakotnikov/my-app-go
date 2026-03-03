@@ -1,35 +1,67 @@
 image: golang:1.24
 
 stages:
-  - test
+  - unit-test
   - build
+  - ui-test
   - deploy
   - release
 
-test:
-  stage: test
+unit-test:
+  stage: unit-test
   script: go test -mod=vendor -cover ./repositories/
 
 build:
   stage: build
-  script: go build -mod=vendor -o my-app-go
+  image: docker:28.4.0
+  services:
+    - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -t my-app-go:$CI_COMMIT_SHORT_SHA .
+    - docker save my-app-go:$CI_COMMIT_SHORT_SHA -o docker-image.tar
   artifacts:
     paths:
-      - my-app-go
+      - docker-image.tar
 
 selenium:
-  stage: build
+  stage: ui-test
+  image: docker:28.4.0
+  services:
+    - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  dependencies:
+    - build
+  before_script:
+    - docker load -i docker-image.tar
   script: 
-    - cd UiTests
+    - docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile ui-tests \
+      up \
+      --abort-on-container-exit \
+      --exit-code-from ui-tests
 
 deploy:
   stage: deploy
-  before_script: 
-    - apt update && apt install -y zip
-    - zip -v
-  script: zip my-app-go.zip my-app-go
+  image: docker:28.4.0
+  services:
+    - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   dependencies:
     - build
+  before_script:
+    - docker load -i docker-image.tar
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push my-app-go:$CI_COMMIT_SHORT_SHA
 
 generate_docs:
   stage: release

@@ -1,0 +1,4 @@
+services:
+  app:
+    image: my-app-go:${CI_COMMIT_SHA}
+    build: null
