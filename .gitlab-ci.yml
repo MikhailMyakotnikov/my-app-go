@@ -18,10 +18,44 @@ build:
     paths:
       - app
 
+migrate_test_db:
+  stage: build
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test_.*/ 
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+  image: docker:28.4.0
+  services:
+    - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    FLYWAY_URL: jdbc:mysql://mysql:3306/test_db
+    FLYWAY_USER: root
+    FLYWAY_PASSWORD: $DB_ROOT_PASS #добавь в CI variables 
+  before_script:
+    - docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      up \
+      -d \
+      mysql
+    - until docker compose exec mysql mysqladmin ping -h "localhost" --silent; do \
+      sleep 2 \
+      done
+  script:
+    - docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      run \
+      --rm \
+      flyway \
+      migrate
+  dependencies:
+    - build
+
 ui-tests:
   stage: ui-tests
-  rules:
-  - if: '$CI_COMMIT_BRANCH == "main"'
   image: docker:28.4.0
   services:
     - docker:28.4.0-dind
@@ -31,11 +65,48 @@ ui-tests:
   before_script:
     - docker compose \
       -f docker-compose.yml \
-      -d \
-      up
+      -f docker-compose.ci.yml \
+      --progile ui tests \
+      up \
+      -d
     - ./app
   script:
     - ./run-ui-tests
+  dependencies:
+    - build
+
+migrate_prod_db:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  image: docker:28.4.0
+  services:
+    - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db
+    FLYWAY_USER: root
+    FLYWAY_PASSWORD: $DB_ROOT_PASS
+  before_script:
+    - docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      up \
+      -d \
+      mysql
+    - until docker compose exec mysql mysqladmin ping -h "localhost" --silent; do \
+      sleep 2 \
+      done
+  script:
+    - docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      run \
+      --rm \
+      flyway \
+      migrate
   dependencies:
     - build
 

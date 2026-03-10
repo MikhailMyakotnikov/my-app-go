@@ -1,6 +1,19 @@
 #!/bin/bash
+set -e
+
+# Аргумент: путь к .env-файлу, по умолчанию .env.dev
+ENV_FILE="${1:-.env.dev}"
+
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Env file '$ENV_FILE' not found!"
+    exit 1
+fi
+
+echo "Loading environment from $ENV_FILE..."
 set -a
-. .env
+. "$ENV_FILE"
 set +a
+
+echo "Running UI tests..."
 cd ui-tests/UiTests
 dotnet test

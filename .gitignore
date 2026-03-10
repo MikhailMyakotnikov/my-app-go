@@ -5,21 +5,22 @@ node_modules/
 
 # Compiled binary file
 /my-app-go
+/app
 
 # IDE сatalogs
 .vscode/
 
 # Build Archives
 *.zip
+*.tar
 
 # Static documentation
 godoc/
 
 # Application configuration
 .env
-
-# database dump
-full_dump.sql
+.env.dev
+.env.prod
 
 # .NET UI tests build artifacts
 ui-tests/UiTests/bin/

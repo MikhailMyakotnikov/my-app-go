@@ -1,29 +1,45 @@
 services:
   mysql:
     image: mysql:8.0.42
-    container_name: my-app-go-mysql
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - $PROJECT_PATH/full_dump.sql:/docker-entrypoint-initdb.d/full_dump.sql
-    ports:
-      - "3307:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD"]
       interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 10
       start_period: 60s
-
+  
+  flyway:
+    image: flyway/flyway:12.0.3
+    volumes:
+      - ./migrations:/flyway/sql
+    environment:
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql #remove the warning
+    depends_on:
+      mysql:
+        condition: service_healthy
+    profiles: ["migrations"]
+  
   selenium-chrome:
-    image: selenium/standalone-chrome:4.18.1
-    container_name: selenium-chrome
-    ports:
-      - "4444:4444"
+    image: selenium/standalone-chrome:130.0-20260222
+    shm_size: 2gb
+    environment:
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
     extra_hosts:
     - "host.docker.internal:host-gateway"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s http://localhost:4444/status | grep -q '\"ready\":true'"]
+    #   interval: 5s
+    #   timeout: 2s
+    #   retries: 12
+    #   start_period: 10s
+    profiles: ["ui-tests"]
 
-volumes:
-  mysql_data:
+  ui-tests:
+    build:
+      context: ./ui-tests/UiTests
+    depends_on:
+      selenium-chrome:
+        condition: service_started
+    profiles: ["ui-tests"]

@@ -1,0 +1,8 @@
+services:
+  mysql:
+    env_file: null
+    volumes:
+      - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql
+
+  flyway:
+    env_file: null
