@@ -3,6 +3,7 @@ image: golang:1.24
 stages:
   - unit-test
   - build
+  - migrates
   - ui-tests
   - deploy
   - release
@@ -21,10 +22,7 @@ build:
       - my-app-go
 
 migrate_test_db:
-  stage: build
-  needs:
-    - job: build
-      artifacts: true
+  stage: migrates
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -69,11 +67,11 @@ migrate_test_db:
 
 ui-tests:
   stage: ui-tests
-  needs:
-    - job: build
-      artifacts: true
-    - job: migrate_test_db
-      artifacts: false
+  # needs:
+  #   - job: build
+  #     artifacts: true
+  #   - job: migrate_test_db
+  #     artifacts: false
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -114,9 +112,9 @@ ui-tests:
 
 migrate_prod_db:
   stage: deploy
-  needs:
-    - job: build
-      artifacts: true
+  # needs:
+  #   - job: build
+  #     artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
@@ -161,9 +159,9 @@ migrate_prod_db:
 
 deploy:
   stage: deploy
-  needs:
-    - job: build
-      artifacts: true
+  # needs:
+  #   - job: build
+  #     artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
