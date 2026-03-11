@@ -13,15 +13,15 @@ unit-test:
 
 build:
   stage: build
-  script: go build -mod=vendor -o app
+  script: go build -mod=vendor -o my-app-go
   artifacts:
     paths:
-      - app
+      - my-app-go
 
 migrate_test_db:
   stage: build
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test_.*/ 
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
   image: docker:28.4.0
   services:
@@ -29,19 +29,28 @@ migrate_test_db:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+
+    # app
+    DB_USER: mikhail
+    DB_PASS: $DEV_DB_PASS
+    DB_HOST: localhost
+    DB_PORT: 3307 
+    DB_NAME: test_db
+    APP_PORT: 8080
+
+    # mysql container
+    DB_ROOT_PASS: $DEV_DB_ROOT_PASS
+    DB_INIT_SCRIPT_NAME: test_db_init.sql
+
+    # flyway container
     FLYWAY_URL: jdbc:mysql://mysql:3306/test_db
     FLYWAY_USER: root
-    FLYWAY_PASSWORD: $DB_ROOT_PASS #добавь в CI variables 
+    FLYWAY_PASSWORD: $DEV_DB_ROOT_PASS
+
+    COMPOSE_PROJECT_NAME: my-app-go-dev
   before_script:
-    - docker compose \
-      -f docker-compose.yml \
-      -f docker-compose.ci.yml \
-      up \
-      -d \
-      mysql
-    - until docker compose exec mysql mysqladmin ping -h "localhost" --silent; do \
-      sleep 2 \
-      done
+    - ENVIRONMENT=dev ./my-app-go & 
+    - sleep 2
   script:
     - docker compose \
       -f docker-compose.yml \
@@ -56,48 +65,78 @@ migrate_test_db:
 
 ui-tests:
   stage: ui-tests
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
   image: docker:28.4.0
   services:
     - docker:28.4.0-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+
+    # app
+    DB_USER: mikhail
+    DB_PASS: $DEV_DB_PASS
+    DB_HOST: localhost
+    DB_PORT: 3307 
+    DB_NAME: test_db
+    APP_PORT: 8080
+
+    # mysql container
+    DB_ROOT_PASS: $DEV_DB_ROOT_PASS
+    DB_INIT_SCRIPT_NAME: test_db_init.sql
+
+    # selenium-chrome container
+    SELENIUM_SERVER_PORT: 4444
+
+    COMPOSE_PROJECT_NAME: my-app-go-dev
   before_script:
+    - ENVIRONMENT=dev ./my-app-go & 
+    - sleep 2
+  script:
     - docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
-      --progile ui tests \
+      --profile ui-tests \
       up \
-      -d
-    - ./app
-  script:
-    - ./run-ui-tests
   dependencies:
     - build
+    - migrate_test_db
 
 migrate_prod_db:
   stage: deploy
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
   image: docker:28.4.0
   services:
     - docker:28.4.0-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+
+    # app
+    DB_USER: mikhail
+    DB_PASS: $PROD_DB_PASS
+    DB_HOST: localhost
+    DB_PORT: 3308 
+    DB_NAME: prod_db
+    APP_PORT: 8081
+
+    # mysql container
+    DB_ROOT_PASS: $PROD_DB_ROOT_PASS
+    DB_INIT_SCRIPT_NAME: prod_db_init.sql
+
+    # flyway container
     FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db
     FLYWAY_USER: root
-    FLYWAY_PASSWORD: $DB_ROOT_PASS
+    FLYWAY_PASSWORD: $PROD_DB_ROOT_PASS
+
+    COMPOSE_PROJECT_NAME: my-app-go-prod
   before_script:
-    - docker compose \
-      -f docker-compose.yml \
-      -f docker-compose.ci.yml \
-      up \
-      -d \
-      mysql
-    - until docker compose exec mysql mysqladmin ping -h "localhost" --silent; do \
-      sleep 2 \
-      done
+    - ENVIRONMENT=prod ./my-app-go & 
+    - sleep 2
   script:
     - docker compose \
       -f docker-compose.yml \
@@ -112,6 +151,9 @@ migrate_prod_db:
 
 deploy:
   stage: deploy
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
   image: docker:28.4.0
   services:
     - docker:28.4.0-dind
