@@ -13,7 +13,9 @@ unit-test:
 
 build:
   stage: build
-  script: go build -mod=vendor -o my-app-go
+  script: 
+    - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
+    - chmod +x my-app-go
   artifacts:
     paths:
       - my-app-go
@@ -92,6 +94,7 @@ ui-tests:
 
     COMPOSE_PROJECT_NAME: my-app-go-dev
   before_script:
+    - chmod +x my-app-go
     - ENVIRONMENT=dev ./my-app-go & 
     - sleep 2
   script:
