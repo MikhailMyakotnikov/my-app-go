@@ -54,7 +54,8 @@ migrate_test_db:
     - ENVIRONMENT=dev ./my-app-go & 
     - sleep 2
   script:
-    - docker compose \
+    - |
+      docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
       --profile migrations \
@@ -98,7 +99,8 @@ ui-tests:
     - ENVIRONMENT=dev ./my-app-go & 
     - sleep 2
   script:
-    - docker compose \
+    - |
+      docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
       --profile ui-tests \
@@ -141,7 +143,8 @@ migrate_prod_db:
     - ENVIRONMENT=prod ./my-app-go & 
     - sleep 2
   script:
-    - docker compose \
+    - |
+      docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
       --profile migrations \
