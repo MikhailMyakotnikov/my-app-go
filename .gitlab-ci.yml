@@ -22,6 +22,9 @@ build:
 
 migrate_test_db:
   stage: build
+  needs:
+    - job: build
+        artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -63,11 +66,14 @@ migrate_test_db:
       --rm \
       flyway \
       migrate
-  dependencies:
-    - build
 
 ui-tests:
   stage: ui-tests
+  needs:
+    - job: build
+        artifacts: true
+    - job: migrate_test_db
+        artifacts: false
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -105,12 +111,12 @@ ui-tests:
       -f docker-compose.ci.yml \
       --profile ui-tests \
       up \
-  dependencies:
-    - build
-    - migrate_test_db
 
 migrate_prod_db:
   stage: deploy
+  needs:
+    - job: build
+        artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
@@ -152,11 +158,12 @@ migrate_prod_db:
       --rm \
       flyway \
       migrate
-  dependencies:
-    - build
 
 deploy:
   stage: deploy
+  needs:
+    - job: build
+        artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -171,8 +178,6 @@ deploy:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  dependencies:
-    - build
 
 generate_docs:
   stage: release
