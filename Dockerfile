@@ -1,4 +1,4 @@
 FROM alpine
-COPY app /app
+COPY my-app-go /my-app-go
 COPY templates /templates
-CMD ["/app"]
+CMD ["/my-app-go"]

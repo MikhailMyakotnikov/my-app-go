@@ -4,9 +4,9 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$MYSQL_ROOT_PASSWORD"]
-      interval: 15s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 12
       start_period: 60s
   
   flyway:
@@ -28,18 +28,20 @@ services:
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
     extra_hosts:
     - "host.docker.internal:host-gateway"
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -s http://localhost:4444/status | grep -q '\"ready\":true'"]
-    #   interval: 5s
-    #   timeout: 2s
-    #   retries: 12
-    #   start_period: 10s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     profiles: ["ui-tests"]
 
   ui-tests:
     build:
       context: ./ui-tests/UiTests
     depends_on:
+      mysql:
+        condition: service_healthy
       selenium-chrome:
-        condition: service_started
+        condition: service_healthy
     profiles: ["ui-tests"]

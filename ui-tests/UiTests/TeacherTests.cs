@@ -32,7 +32,7 @@ public class TeacherTests
 
         driver = new RemoteWebDriver(uri, options);
 
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
     }
     [TearDown]
     public void TearDown()
