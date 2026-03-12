@@ -3,8 +3,9 @@ image: golang:1.24
 stages:
   - unit-test
   - build
-  - migrates
+  - migrates-test
   - ui-tests
+  - migrates-prod
   - deploy
   - release
 
@@ -15,15 +16,13 @@ unit-test:
 build:
   stage: build
   script: 
-    - go build -mod=vendor -o my-app-go
+    - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
   artifacts:
     paths:
       - my-app-go
 
 migrate_test_db:
-  stage: migrates
-  # needs:
-  #   artifacts: true
+  stage: migrates-test
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -56,7 +55,7 @@ migrate_test_db:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=dev ./my-app-go & 
-    - until curl -s http://localhost:$APP_PORT; do sleep 1; done
+    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
   script:
     - |
       docker compose \
@@ -70,8 +69,6 @@ migrate_test_db:
 
 ui-tests:
   stage: ui-tests
-  # needs:
-  #   artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -102,7 +99,7 @@ ui-tests:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=dev ./my-app-go & 
-    - until curl -s http://localhost:$APP_PORT; do sleep 1; done
+    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
   script:
     - |
       docker compose \
@@ -110,11 +107,11 @@ ui-tests:
       -f docker-compose.ci.yml \
       --profile ui-tests \
       up \
+      --abort-on-container-exit \
+      --exit-code-from ui-tests
 
 migrate_prod_db:
-  stage: deploy
-  # needs:
-  #   artifacts: true
+  stage: migrates-prod
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
@@ -147,7 +144,7 @@ migrate_prod_db:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=prod ./my-app-go & 
-    - until curl -s http://localhost:$APP_PORT; do sleep 1; done
+    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
   script:
     - |
       docker compose \
@@ -161,8 +158,6 @@ migrate_prod_db:
 
 deploy:
   stage: deploy
-  # needs:
-  #   artifacts: true
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
@@ -174,9 +169,9 @@ deploy:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
 
 generate_docs:
