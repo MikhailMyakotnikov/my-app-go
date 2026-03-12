@@ -62,7 +62,7 @@ migrate_test_db:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=dev ./my-app-go & 
-    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
+    - sleep 2
   script:
     - |
       docker compose \
@@ -108,7 +108,7 @@ ui-tests:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=dev ./my-app-go & 
-    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
+    - sleep 2
   script:
     - |
       docker compose \
@@ -155,7 +155,7 @@ migrate_prod_db:
   before_script:
     - chmod +x my-app-go
     - ENVIRONMENT=prod ./my-app-go & 
-    - timeout 30 sh -c 'until curl -s http://localhost:$APP_PORT; do sleep 1; done'
+    - sleep 2
   script:
     - |
       docker compose \
