@@ -1,12 +1,10 @@
 services:
   mysql:
     ports:
-      - "$DB_PORT:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
       MYSQL_DATABASE: $DB_NAME
-    volumes:
-      - ./$DB_INIT_SCRIPT_NAME:/docker-entrypoint-initdb.d/$DB_INIT_SCRIPT_NAME
 
   flyway:
     environment:
@@ -16,10 +14,11 @@ services:
 
   selenium-chrome:
     ports:
-      - "$SELENIUM_SERVER_PORT:4444"
+      - "4444:4444"
     environment:
-      APP_URL: http://host.docker.internal:${APP_PORT}
+      APP_URL: http://my-app-go:${APP_PORT}
 
   ui-tests:
     environment:
       SELENIUM_SERVER_URI: http://selenium-chrome:4444
+      APP_URL: http://my-app-go:${APP_PORT}

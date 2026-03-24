@@ -1,33 +1,6 @@
 image: golang:1.24
 
-stages:
-  - unit-test
-  - build
-  - ui-tests
-  - deploy
-  - release
-
-unit-test:
-  stage: unit-test
-  script: go test -mod=vendor -cover ./repositories/
-
-build:
-  stage: build
-  script: 
-    - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
-    - chmod +x my-app-go
-  artifacts:
-    paths:
-      - my-app-go
-
-migrate_test_db:
-  stage: build
-  rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
-  image: docker:28.4.0
-  services:
-    - docker:28.4.0-dind
+.compose_variables: &compose_variables
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -35,141 +8,172 @@ migrate_test_db:
     # app
     DB_USER: mikhail
     DB_PASS: $DEV_DB_PASS
-    DB_HOST: localhost
-    DB_PORT: 3307 
+    DB_HOST: docker
+    DB_PORT: 3306
     DB_NAME: test_db
     APP_PORT: 8080
 
     # mysql container
     DB_ROOT_PASS: $DEV_DB_ROOT_PASS
-    DB_INIT_SCRIPT_NAME: test_db_init.sql
 
     # flyway container
-    FLYWAY_URL: jdbc:mysql://mysql:3306/test_db
+    FLYWAY_URL: jdbc:mysql://mysql:3306/test_db?allowPublicKeyRetrieval=true&useSSL=false
     FLYWAY_USER: root
     FLYWAY_PASSWORD: $DEV_DB_ROOT_PASS
 
     COMPOSE_PROJECT_NAME: my-app-go-dev
-  before_script:
-    - ENVIRONMENT=dev ./my-app-go & 
-    - sleep 2
-  script:
-    - docker compose \
-      -f docker-compose.yml \
-      -f docker-compose.ci.yml \
-      --profile migrations \
-      run \
-      --rm \
-      flyway \
-      migrate
+
+stages:
+  - unit-tests
+  - build
+  - migrations-test-db
+  - ui-tests
+  - migrations-prod-db
+  - deploy
+  - release
+
+unit_test:
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+  stage: unit-tests
+  script: go test -mod=vendor -cover ./repositories/
+
+build:
+  rules:
+    - when: always
+  stage: build
+  script: 
+    - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
+  artifacts:
+    paths:
+      - my-app-go
+
+migrations_test_db:
+  <<: *compose_variables
+  stage: migrations-test-db
   dependencies:
     - build
-
-ui-tests:
-  stage: ui-tests
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
   image: docker:28.4.0
   services:
-    - docker:28.4.0-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-
-    # app
-    DB_USER: mikhail
-    DB_PASS: $DEV_DB_PASS
-    DB_HOST: localhost
-    DB_PORT: 3307 
-    DB_NAME: test_db
-    APP_PORT: 8080
-
-    # mysql container
-    DB_ROOT_PASS: $DEV_DB_ROOT_PASS
-    DB_INIT_SCRIPT_NAME: test_db_init.sql
-
-    # selenium-chrome container
-    SELENIUM_SERVER_PORT: 4444
-
-    COMPOSE_PROJECT_NAME: my-app-go-dev
+    - name: docker:28.4.0-dind
+      alias: docker
   before_script:
-    - chmod +x my-app-go
-    - ENVIRONMENT=dev ./my-app-go & 
-    - sleep 2
+    - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
-    - docker compose \
+    - |
+      docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      up \
+      --exit-code-from flyway
+
+ui_tests:
+  <<: *compose_variables
+  stage: ui-tests
+  dependencies:
+    - build
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+  image: docker:28.4.0
+  services:
+    - name: docker:28.4.0-dind
+      alias: docker
+  before_script:
+    - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
+    - docker build -t my-app-go-tmp-image .
+  script:
+    - |
+      docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      up \
+      --exit-code-from flyway
+    # running app inside container instead of running on the host(job-container) 
+    # to get access from Selenium tests container
+    - |
+      docker run -d \
+      --name my-app-go \
+      --network ${COMPOSE_PROJECT_NAME}_default \
+      -e ENVIRONMENT=dev \
+      -e DB_USER=mikhail \
+      -e DB_PASS=$DEV_DB_PASS \
+      -e DB_HOST=mysql \
+      -e DB_PORT=3306 \
+      -e DB_NAME=test_db \
+      -e APP_PORT=8080 \
+      -p 8080:8080 \
+      my-app-go-tmp-image
+    - |
+      docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
       --profile ui-tests \
       up \
+      --exit-code-from ui-tests
+
+migrations_prod_db:
+  <<: *compose_variables
+  stage: migrations-prod-db
   dependencies:
     - build
-    - migrate_test_db
-
-migrate_prod_db:
-  stage: deploy
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
   image: docker:28.4.0
   services:
-    - docker:28.4.0-dind
+    - name: docker:28.4.0-dind
+      alias: docker
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-
     # app
-    DB_USER: mikhail
     DB_PASS: $PROD_DB_PASS
-    DB_HOST: localhost
-    DB_PORT: 3308 
     DB_NAME: prod_db
-    APP_PORT: 8081
 
     # mysql container
     DB_ROOT_PASS: $PROD_DB_ROOT_PASS
-    DB_INIT_SCRIPT_NAME: prod_db_init.sql
 
     # flyway container
-    FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db
-    FLYWAY_USER: root
+    FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db?allow=true&useSSL=false
     FLYWAY_PASSWORD: $PROD_DB_ROOT_PASS
 
     COMPOSE_PROJECT_NAME: my-app-go-prod
   before_script:
-    - ENVIRONMENT=prod ./my-app-go & 
-    - sleep 2
+    - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
-    - docker compose \
+    - |
+      docker compose \
       -f docker-compose.yml \
       -f docker-compose.ci.yml \
       --profile migrations \
-      run \
-      --rm \
-      flyway \
-      migrate
-  dependencies:
-    - build
+      up \
+      --exit-code-from flyway
 
 deploy:
   stage: deploy
+  dependencies:
+    - build
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
   image: docker:28.4.0
   services:
-    - docker:28.4.0-dind
+    - name: docker:28.4.0-dind
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  dependencies:
-    - build
 
 generate_docs:
   stage: release
