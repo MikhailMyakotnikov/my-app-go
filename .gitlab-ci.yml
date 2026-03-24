@@ -142,7 +142,7 @@ migrations_prod_db:
     DB_ROOT_PASS: $PROD_DB_ROOT_PASS
 
     # flyway container
-    FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db?allow=true&useSSL=false
+    FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db?allowPublicKeyRetrieval=true&useSSL=false
     FLYWAY_PASSWORD: $PROD_DB_ROOT_PASS
 
     COMPOSE_PROJECT_NAME: my-app-go-prod
