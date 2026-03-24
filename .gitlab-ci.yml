@@ -41,7 +41,10 @@ unit_test:
 
 build:
   rules:
-    - when: always
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
   stage: build
   script: 
     - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
