@@ -6,7 +6,6 @@ services:
       - .env.prod
     volumes:
       - mysql_prod_data:/var/lib/mysql
-      - ./prod_db_init.sql:/docker-entrypoint-initdb.d/prod_db_init.sql
     environment:
       MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
       MYSQL_DATABASE: prod_db

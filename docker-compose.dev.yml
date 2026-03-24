@@ -6,7 +6,6 @@ services:
       - .env.dev
     volumes:
       - mysql_dev_data:/var/lib/mysql
-      - ./test_db_init.sql:/docker-entrypoint-initdb.d/test_db_init.sql
     environment:
       MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
       MYSQL_DATABASE: test_db
@@ -15,7 +14,7 @@ services:
     env_file:
       - .env.dev
     environment:
-      FLYWAY_URL: jdbc:mysql://mysql:3306/test_db?allowPublicKeyRetrieval=1
+      FLYWAY_URL: jdbc:mysql://mysql:3306/test_db?createDatabaseIfNotExist=1&allowPublicKeyRetrieval=1
       FLYWAY_USER: root
       FLYWAY_PASSWORD: $DB_ROOT_PASS
 

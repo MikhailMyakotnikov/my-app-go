@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Аргумент: путь к .env-файлу, по умолчанию .env.dev
+# Argument: path to .env-file, .env.dev by default
 ENV_FILE="${1:-.env.dev}"
 
 if [ ! -f "$ENV_FILE" ]; then

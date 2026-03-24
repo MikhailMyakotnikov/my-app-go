@@ -22,9 +22,9 @@ public class TeacherTests
     public void SetUp()
     {
         if(SeleniumServerUri == null) throw new NullReferenceException(
-            $"Ошибка: переменная {nameof(SeleniumServerUri)} не может хранить null");
+            $"Error: {nameof(SeleniumServerUri)} cannot be null");
         if(BaseAppUrl == null) throw new NullReferenceException(
-            $"Ошибка: переменная {nameof(BaseAppUrl)} не может хранить null");
+            $"Error: {nameof(BaseAppUrl)} cannot be null");
         
         Uri uri = new Uri(SeleniumServerUri);
 
