@@ -122,7 +122,7 @@ ui_tests:
       --exit-code-from ui-tests
 
 migrations_prod_db:
-  <<: *compose_variables
+  extends: .compose_variables
   stage: migrations-prod-db
   dependencies:
     - build
