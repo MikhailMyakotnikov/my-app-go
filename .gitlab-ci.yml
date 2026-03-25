@@ -150,13 +150,13 @@ migrations_prod_db:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
     - sleep 1
-    # - |
-    #   docker compose \
-    #   -f docker-compose.yml \
-    #   -f docker-compose.ci.yml \
-    #   --profile migrations \
-    #   up \
-    #   --exit-code-from flyway
+    - |
+      docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      up \
+      --exit-code-from flyway
 
 deploy:
   stage: deploy
