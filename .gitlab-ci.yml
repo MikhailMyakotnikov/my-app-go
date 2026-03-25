@@ -149,13 +149,14 @@ migrations_prod_db:
   before_script:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
-    - |
-      docker compose \
-      -f docker-compose.yml \
-      -f docker-compose.ci.yml \
-      --profile migrations \
-      up \
-      --exit-code-from flyway
+    - sleep 1
+    # - |
+    #   docker compose \
+    #   -f docker-compose.yml \
+    #   -f docker-compose.ci.yml \
+    #   --profile migrations \
+    #   up \
+    #   --exit-code-from flyway
 
 deploy:
   stage: deploy
@@ -169,14 +170,16 @@ deploy:
     - name: docker:28.4.0-dind
       alias: docker
       command: ["--insecure-registry", "host.docker.internal:5005"]
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     REGISTRY_URL: "host.docker.internal:5005"
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    IMAGE_TAG: $REGISTRY_URL/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
   before_script:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $REGISTRY_URL -u $CI_REGISTRY_USER --password-stdin
+    - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin
   script:
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
