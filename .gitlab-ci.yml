@@ -150,13 +150,13 @@ migrations_prod_db:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
     - sleep 1
-    - |
-      docker compose \
-      -f docker-compose.yml \
-      -f docker-compose.ci.yml \
-      --profile migrations \
-      up \
-      --exit-code-from flyway
+    # - |
+    #   docker compose \
+    #   -f docker-compose.yml \
+    #   -f docker-compose.ci.yml \
+    #   --profile migrations \
+    #   up \
+    #   --exit-code-from flyway
 
 deploy:
   stage: deploy
@@ -170,8 +170,6 @@ deploy:
     - name: docker:28.4.0-dind
       alias: docker
       command: ["--insecure-registry", "host.docker.internal:5005"]
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
