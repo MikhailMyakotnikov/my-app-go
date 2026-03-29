@@ -179,7 +179,7 @@ deploy:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
     - ping -c 3 gitlab.local
     - telnet gitlab.local 5005 || echo "Port 5005 is closed for me"
-    - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin --debug
+    - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin
   script:
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
