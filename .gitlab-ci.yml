@@ -173,7 +173,7 @@ deploy:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    REGISTRY_URL: "host.docker.internal:5005"
+    REGISTRY_URL: "gitlab.local:5005"
     IMAGE_TAG: $REGISTRY_URL/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
   before_script:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
