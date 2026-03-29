@@ -177,8 +177,7 @@ deploy:
     IMAGE_TAG: $REGISTRY_URL/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
   before_script:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
-    - ping -c 2 host.docker.internal || true
-    - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin
+    - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin --debug
   script:
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
