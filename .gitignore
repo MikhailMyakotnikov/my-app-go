@@ -57,3 +57,9 @@ logs/
 # Cloud credentials
 .aws/
 .azure/
+
+# Dockerfile that creates custom image for release ci-job
+Dockerfile.release
+
+# SSL certificates for custom image
+certs/
