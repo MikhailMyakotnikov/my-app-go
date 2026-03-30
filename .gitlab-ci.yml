@@ -23,6 +23,12 @@ image: golang:1.24
 
     COMPOSE_PROJECT_NAME: my-app-go-dev
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
 stages:
   - unit-tests
   - build
@@ -186,10 +192,6 @@ generate_docs:
   stage: release
   rules: 
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
-      when: always
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      when: always
   script:
     - go install golang.org/x/tools/cmd/godoc@v0.1.0
     - export PATH="$PATH:/root/go/bin"
@@ -203,10 +205,6 @@ publish_docs:
   stage: release
   rules: 
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
-      when: always
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      when: always
   needs:
     - job: generate_docs
   script:
@@ -222,10 +220,6 @@ release:
   image: gitlab.local:5005/root/my-app-go/custom-release-cli:v0.24.0
   rules:
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
-      when: always
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      when: always
   needs:
     - job: generate_docs
   script:
