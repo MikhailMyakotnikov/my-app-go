@@ -220,4 +220,4 @@ release:
     - echo "Creating GitLab release..."
   release:
     tag_name: '$CI_COMMIT_TAG'
-    description: '$CI_COMMIT_TAG'
+    description: '$CI_COMMIT_TAG' 
