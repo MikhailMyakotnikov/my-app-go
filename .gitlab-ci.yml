@@ -169,8 +169,8 @@ deploy:
   dependencies:
     - build
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "wip"
-          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
   image: docker:28.4.0
   services:
     - name: docker:28.4.0-dind
