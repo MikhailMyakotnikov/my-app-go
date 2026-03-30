@@ -150,13 +150,13 @@ migrations_prod_db:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
   script:
     - sleep 1
-    # - |
-    #   docker compose \
-    #   -f docker-compose.yml \
-    #   -f docker-compose.ci.yml \
-    #   --profile migrations \
-    #   up \
-    #   --exit-code-from flyway
+    - |
+      docker compose \
+      -f docker-compose.yml \
+      -f docker-compose.ci.yml \
+      --profile migrations \
+      up \
+      --exit-code-from flyway
 
 deploy:
   stage: deploy
@@ -177,10 +177,6 @@ deploy:
     IMAGE_TAG: $REGISTRY_URL/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
   before_script:
     - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 10; done
-    - mkdir -p /etc/docker/certs.d/gitlab.local:5005
-    - cp /etc/gitlab/ssl/gitlab.local.crt /etc/docker/certs.d/gitlab.local:5005/ca.crt
-    - ping -c 3 gitlab.local
-    - telnet gitlab.local 5005 || echo "Port 5005 is closed for me"
     - echo "$CI_DEPLOY_PASSWORD" | docker login $REGISTRY_URL -u $CI_DEPLOY_USER --password-stdin
   script:
     - docker build -t $IMAGE_TAG .
