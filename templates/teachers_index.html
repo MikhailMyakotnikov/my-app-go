@@ -17,8 +17,9 @@
             <tr>
                 <td>{{.Name}}</td>
                 <td>
-                    <a href="/teachers/edit?id={{.ID}}">Редактировать</a> |
-                    <a href="/teachers/delete?id={{.ID}}" onclick="return confirm('Удалить преподавателя?')">Удалить</a>
+                    <a href="/teachers/edit?id={{.ID}}" data-testid="edit-teacher-action-btn">Редактировать</a> |
+                    <a href="/teachers/delete?id={{.ID}}" onclick="return confirm('Удалить преподавателя?')"
+                        data-testid="delete-teacher-action-btn">Удалить</a>
                 </td>
             </tr>
             {{end}}
