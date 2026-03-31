@@ -1,8 +1,48 @@
 services:
-  apache:
-    image: httpd:2.4
-    container_name: my-app-go-publish-docs
-    ports:
-      - "8082:80"
+  mysql:
+    image: mysql:8.0.42
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "cat < /dev/tcp/127.0.0.1/3306"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 300s
+  
+  flyway:
+    image: flyway/flyway:12.0.3
+    command: migrate
     volumes:
-      - /opt/my-app-go/docs:/usr/local/apache2/htdocs/
+      - ./migrations:/flyway/sql
+    environment:
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql #remove the warning
+    depends_on:
+      mysql:
+        condition: service_healthy
+    profiles: ["migrations"]
+  
+  selenium-chrome:
+    image: selenium/standalone-chrome:130.0-20260222
+    shm_size: 2gb
+    environment:
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
+    profiles: ["ui-tests"]
+
+  ui-tests:
+    build:
+      context: ./ui-tests/UiTests
+    depends_on:
+      mysql:
+        condition: service_healthy
+      selenium-chrome:
+        condition: service_healthy
+    profiles: ["ui-tests"]

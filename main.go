@@ -19,7 +19,17 @@ var tpl = template.Must(template.ParseGlob("templates/*.html"))
 func main() {
 	var err error
 
-	err = godotenv.Load()
+	env := os.Getenv("ENVIRONMENT")
+
+	switch env {
+	case "prod":
+		err = godotenv.Load(".env.prod")
+	case "dev":
+		godotenv.Load(".env.dev")
+	default:
+		log.Fatal("Error loading .env file. Variable $ENVIRONMENT must be \"dev\" or \"prod\"")
+	}
+
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
@@ -30,8 +40,10 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
+	appPort := os.Getenv("APP_PORT")
+
 	dsn := fmt.Sprintf(
-		// user:123@tcp(127.0.0.1:1234)/my_app_go
+		// Example: user:123@tcp(127.0.0.1:1234)/my_app_go
 		"%s:%s@tcp(%s:%s)/%s?tls=skip-verify",
 		dbUser, dbPass, dbHost, dbPort, dbName,
 	)
@@ -82,8 +94,8 @@ func main() {
 	http.HandleFunc("/students_courses/insert", handlers.InsertStudentCourse)
 	http.HandleFunc("/students_courses/delete", handlers.DeleteStudentCourse)
 
-	fmt.Println("Server started at http://localhost:8081")
-	err = http.ListenAndServe("localhost:8081", nil)
+	fmt.Printf("Server started at http://localhost:%s\n", appPort)
+	err = http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", appPort), nil)
 	if err != nil {
 		log.Fatal("Server startup error: ", err)
 	}

@@ -1,0 +1,30 @@
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:$DB_PORT:3306"
+    env_file:
+      - .env.prod
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
+      MYSQL_DATABASE: prod_db
+
+  flyway:
+    env_file:
+      - .env.prod
+    environment:
+      FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db?allowPublicKeyRetrieval=1
+      FLYWAY_USER: root
+      FLYWAY_PASSWORD: $DB_ROOT_PASS
+
+  selenium-chrome:
+    ports:
+      - "127.0.0.1:$SELENIUM_SERVER_PORT:4444"
+
+  ui-tests:
+    env_file:
+      - .env.prod
+
+volumes:
+  mysql_prod_data:
