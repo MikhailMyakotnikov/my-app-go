@@ -30,4 +30,11 @@ sed -i "s|href=\"handlers.html\"|href=\"pkg/$PROJECT_NAME/handlers.html\"|g" pub
 sed -i "s|href=\"models.html\"|href=\"pkg/$PROJECT_NAME/models.html\"|g" public/index.html
 sed -i "s|href=\"repositories.html\"|href=\"pkg/$PROJECT_NAME/repositories.html\"|g" public/index.html
 
+# remove duplicates like /my-app-go/my-app-go/
+sed -i 's|/my-app-go/my-app-go/|/my-app-go/|g' public/index.html
+
+# fix style references
+sed -i 's|../../lib/|/my-app-go/lib/|g' public/index.html
+sed -i 's|../lib/|/my-app-go/lib/|g' public/index.html
+
 echo "Documentation is ready"
