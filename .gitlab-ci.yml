@@ -210,8 +210,9 @@ pages:
     # make all links absolute relative to the domain
     # path in file system: ../../lib/godoc/style.css
     # have to become URL: /my-app-go/lib/godoc/style.css
-    - find public -name "*.html" -exec sed -i 's|../../|/my-app-go/|g' {} +
-    - find public -name "*.html" -exec sed -i 's|../|/my-app-go/|g' {} +
+    - find public -name "*.html" -exec sed -i 's|\.\./|/my-app-go/|g' {} +
+    # cleanup possible duplicates
+    - find public -name "*.html" -exec sed -i 's|//my-app-go/|/my-app-go/|g' {} +
   artifacts:
     paths:
       - public
