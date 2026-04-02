@@ -201,7 +201,7 @@ pages:
   stage: release
   rules: 
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
-  needs:
+  needs: 
     - job: generate_docs
   script:
     - mkdir -p public
