@@ -206,6 +206,7 @@ pages:
   script:
     - mkdir -p public
     - cp -r godoc/* public/
+    - cp public/pkg/my-app-go/index.html public/index.html
   artifacts:
     paths:
       - public
