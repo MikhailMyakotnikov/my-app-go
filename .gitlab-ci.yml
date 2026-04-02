@@ -204,11 +204,10 @@ pages:
   needs:
     - job: generate_docs
   script:
-    # - chmod +x prepare_docs.sh
-    # - ./prepare_docs.sh
     - mkdir -p public
     - cp -r godoc/* public/
-    - echo '<meta http-equiv="refresh" content="0; url=pkg/my-app-go/index.html" />;' > public/index.html
+    # redirect from root to index.html
+    - echo '<meta http-equiv="refresh" content="0; url=pkg/my-app-go/index.html" />' > public/index.html
   artifacts:
     paths:
       - public
