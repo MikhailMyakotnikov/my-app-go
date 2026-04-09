@@ -34,7 +34,6 @@ stages:
   - release
 
 unit_test:
-  stage: unit-tests
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -45,7 +44,6 @@ unit_test:
       - coverage.out
 
 build:
-  stage: build
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
