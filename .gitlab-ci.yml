@@ -181,7 +181,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner \
+    - |
+      sonar-scanner \
       -Dsonar.projectKey=my-app-go \
       -Dsonar.sources=. \
       -Dsonar.sourceEncoding=UTF-8 \
