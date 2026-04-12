@@ -173,6 +173,8 @@ sonarqube-check:
   image:
     name: sonarsource/sonar-scanner-cli:12.1
     entrypoint: [""]
+  extra_hosts:
+    - "sonar.local:host-gateway"
   variables:
     SONAR_HOST_URL: $SONAR_HOST_URL
     SONAR_TOKEN: $SONAR_TOKEN
