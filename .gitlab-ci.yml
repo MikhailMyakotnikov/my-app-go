@@ -181,12 +181,10 @@ sonarqube-check:
   script:
     - sonar-scanner \
       -Dsonar.projectKey=my-app-go \
-      # -Dsonar.tls.skipValidation=true \
       -Dsonar.sources=. \
       -Dsonar.sourceEncoding=UTF-8 \
       -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**, \
       godoc/**,certs/*,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl" \
-      # unit-tests results are saved in coverage.out \
       -Dsonar.go.coverage.reportPaths=coverage.out \
       -Dsonar.test.inclusions="**/*_test.go,ui-tests/UiTests/*.cs" \
       -Dsonar.qualitygate.wait=true 
