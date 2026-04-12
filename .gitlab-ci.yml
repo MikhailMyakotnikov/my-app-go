@@ -38,6 +38,8 @@ unit_test:
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
   stage: unit-tests
   script: go test -mod=vendor -coverprofile=coverage.out ./repositories/
   artifacts:
