@@ -169,7 +169,7 @@ migrations_prod_db:
 sonarqube-check:
   stage: static-analysis
   dependencies:
-    - unit-test
+    - unit_test
   image:
     name: sonarsource/sonar-scanner-cli:12.1
     entrypoint: [""]
