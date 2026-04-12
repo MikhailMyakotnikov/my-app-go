@@ -34,6 +34,7 @@ stages:
   - release
 
 unit_test:
+  stage: unit-tests
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -44,6 +45,7 @@ unit_test:
       - coverage.out
 
 build:
+  stage: build
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -177,17 +179,17 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner 
-      -Dsonar.projectKey=my-app-go
-      # -Dsonar.tls.skipValidation=true
-      -Dsonar.sources=.
-      -Dsonar.sourceEncoding=UTF-8
-      -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**,
-      godoc/**,certs/*,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl"
-      # unit-tests results are saved in coverage.out
-      -Dsonar.go.coverage.reportPaths=coverage.out
-      -Dsonar.test.inclusions="**/*_test.go,ui-tests/UiTests/*.cs"
-      -Dsonar.qualitygate.wait=true
+    - sonar-scanner \
+      -Dsonar.projectKey=my-app-go \
+      # -Dsonar.tls.skipValidation=true \
+      -Dsonar.sources=. \
+      -Dsonar.sourceEncoding=UTF-8 \
+      -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**, \
+      godoc/**,certs/*,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl" \
+      # unit-tests results are saved in coverage.out \
+      -Dsonar.go.coverage.reportPaths=coverage.out \
+      -Dsonar.test.inclusions="**/*_test.go,ui-tests/UiTests/*.cs" \
+      -Dsonar.qualitygate.wait=true 
   allow_failure: false
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
