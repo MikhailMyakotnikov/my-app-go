@@ -29,17 +29,25 @@ stages:
   - migrations-test-db
   - ui-tests
   - migrations-prod-db
+  - static-analysis
   - deploy
   - release
 
 unit_test:
+  stage: unit-tests
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
   stage: unit-tests
-  script: go test -mod=vendor -cover ./repositories/
+  script: go test -mod=vendor -coverprofile=coverage.out ./repositories/
+  artifacts:
+    paths:
+      - coverage.out
 
 build:
+  stage: build
   rules:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^test.*/ 
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "wip"'
@@ -47,7 +55,7 @@ build:
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release.*/'
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
           && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-  stage: build 
+  stage: build
   script: 
     - CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o my-app-go
   artifacts:
@@ -160,6 +168,37 @@ migrations_prod_db:
       up \
       --exit-code-from flyway
 
+sonarqube-check:
+  stage: static-analysis
+  dependencies:
+    - unit_test
+  image:
+    name: sonarsource/sonar-scanner-cli:12.1
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "1" 
+    NODE_OPTIONS: "--max-old-space-size=3072"
+    SONAR_SCANNER_OPTS: "-Xmx1536m"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - |
+      sonar-scanner \
+      -Dsonar.projectKey=root_my-app-go_457e5c30-5356-4727-9db0-bbd4dff6cac0 \
+      -Dsonar.sources=. \
+      -Dsonar.sourceEncoding=UTF-8 \
+      -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**,godoc/**,certs/**,templates/**,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl,generate_go_documentation.sh,run-ui-tests.sh" \
+      -Dsonar.go.coverage.reportPaths=coverage.out \
+      -Dsonar.test.inclusions="**/*_test.go,ui-tests/UiTests/*.cs" \
+      -Dsonar.qualitygate.wait=true 
+  allow_failure: false
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^release.*/
+          && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+
 deploy:
   stage: deploy
   dependencies:
@@ -197,17 +236,15 @@ generate_docs:
     paths:
       - godoc/
 
-pages:
+publish_docs:
   stage: release
   rules: 
     - if: '$CI_COMMIT_TAG =~ /^release.*/'
-  needs: 
+  needs:
     - job: generate_docs
   script:
     - mkdir -p public
     - cp -r godoc/* public/
-    # redirect from root to index.html
-    - echo '<meta http-equiv="refresh" content="0; url=pkg/my-app-go/index.html" />' > public/index.html
   artifacts:
     paths:
       - public
