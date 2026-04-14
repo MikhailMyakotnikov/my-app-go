@@ -188,7 +188,7 @@ sonarqube-check:
       -Dsonar.projectKey=root_my-app-go_457e5c30-5356-4727-9db0-bbd4dff6cac0 \
       -Dsonar.sources=. \
       -Dsonar.sourceEncoding=UTF-8 \
-      -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**,godoc/**,certs/*,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl,generate_go_documentation.sh,run-ui-tests.sh" \
+      -Dsonar.exclusions="vendor/**,ui-tests/UiTests/bin/**,ui-tests/UiTests/obj/**,godoc/**,certs/**,templates/**,go.mod,go.sum,my-app-go,my-app-go.sln,README.md,systemctl,generate_go_documentation.sh,run-ui-tests.sh" \
       -Dsonar.go.coverage.reportPaths=coverage.out \
       -Dsonar.test.inclusions="**/*_test.go,ui-tests/UiTests/*.cs" \
       -Dsonar.qualitygate.wait=true 
