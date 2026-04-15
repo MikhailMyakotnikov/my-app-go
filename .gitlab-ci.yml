@@ -20,6 +20,7 @@ image: golang:1.24
     FLYWAY_URL: jdbc:mysql://mysql:3306/test_db?allowPublicKeyRetrieval=true&useSSL=false
     FLYWAY_USER: root
     FLYWAY_PASSWORD: $DEV_DB_ROOT_PASS
+    DB_PASS: $DEV_DB_PASS
 
     COMPOSE_PROJECT_NAME: my-app-go-dev
 
@@ -154,6 +155,7 @@ migrations_prod_db:
     # flyway container
     FLYWAY_URL: jdbc:mysql://mysql:3306/prod_db?allowPublicKeyRetrieval=true&useSSL=false
     FLYWAY_PASSWORD: $PROD_DB_ROOT_PASS
+    DB_PASS: $PROD_DB_PASS
 
     COMPOSE_PROJECT_NAME: my-app-go-prod
   before_script:
