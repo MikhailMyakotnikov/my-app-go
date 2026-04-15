@@ -16,6 +16,7 @@ services:
       - ./migrations:/flyway/sql
     environment:
       FLYWAY_LOCATIONS: filesystem:/flyway/sql #remove the warning
+      FLYWAY_PLACEHOLDERS_USERPASSWORD: ${DB_PASS}
     depends_on:
       mysql:
         condition: service_healthy
