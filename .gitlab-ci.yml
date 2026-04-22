@@ -245,6 +245,8 @@ pages:
   script:
     - mkdir -p public
     - cp -r godoc/* public/
+    # redirect from root to index.html
+    - echo '<meta http-equiv="refresh" content="0; url=pkg/my-app-go/index.html" />' > public/index.html
   artifacts:
     paths:
       - public
