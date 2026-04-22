@@ -64,4 +64,4 @@ Open your browser and go to:
 
 Flyway will create the required tables and populate them with initial data:
 
-    docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev --profile migrations run --rm flyway migrate
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev --profile migrations run --rm flyway migrate 
